@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+:root {
+  --oc-blue: #1D358E;
+  --oc-red: #E61D2B;
+  --oc-light-bg: #F8F9FA;
+  --sidebar-width: 260px;
+}
+
+@theme {
+  --color-primary: var(--oc-blue);
+  --color-primary-hover: #15276b;
+  --color-secondary: var(--oc-red);
+  --color-accent: var(--oc-red);
+  --color-background: #ffffff;
+  --color-surface: var(--oc-light-bg);
+  --color-text: #1e293b;
+  --color-text-muted: #64748b;
+  --color-border: #e2e8f0;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-heading: "Inter", system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-text antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold text-text;
+  }
+}
+
+@layer utilities {
+  .container-main {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  .section-padding {
+    @apply py-16 sm:py-24 lg:py-32;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Animations for scroll-triggering */
+.animate-fade-in {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-fade-in.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
