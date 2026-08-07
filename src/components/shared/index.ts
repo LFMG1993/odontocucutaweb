@@ -1,1 +1,6 @@
 export { Button } from "./Button"
+export { AnimatedSection } from "./AnimatedSection"
+export { SEO } from "./SEO"
+export { WhatsAppChatButton } from "./WhatsAppChatButton"
+export { ValoracionModal } from "./ValoracionModal"
+export { Logo } from "./Logo"

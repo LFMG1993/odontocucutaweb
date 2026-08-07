@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom"
 import { cn } from "@/utils/cn"
-import { Button } from "@/components/shared/Button"
+import { Button } from "@/components/shared"
+import { Icon } from "@/utils/icons"
 import { Menu, X, Phone, MapPin, Mail } from "lucide-react"
 import { useState, useEffect } from "react"
 
@@ -36,12 +37,7 @@ export function Header() {
       <div className="container-main">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2" aria-label="Odontocúcuta Inicio">
-            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center transition-transform hover:scale-105">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-              </svg>
-            </div>
-            <span className="font-heading font-bold text-xl text-text hidden sm:block">Odontocúcuta</span>
+            <Icon name="odontocucuta" className="h-20 w-auto transition-transform hover:scale-[1.02]" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">

@@ -1,4 +1,24 @@
 import type { Servicio, EquipoMedico, BlogPost, Sede, Convenio, Testimonio, Estadistica } from "@/types"
+import { Shield, Zap, Headphones, Truck, Users, Award, GraduationCap, MapPin, Smile, AlignCenterHorizontal, Bone, Microscope, Baby, Puzzle, HeartPulse, Brain } from "lucide-react"
+
+export const iconMap = {
+  Shield,
+  Zap,
+  Headphones,
+  Truck,
+  Users,
+  Award,
+  GraduationCap,
+  MapPin,
+  Smile,
+  AlignCenterHorizontal,
+  Bone,
+  Microscope,
+  Baby,
+  Puzzle,
+  HeartPulse,
+  Brain,
+} as const
 
 export const servicios: Servicio[] = [
   {
@@ -266,6 +286,58 @@ Tratamos liquen plan oral, candidiasis recurrente, síndrome de boca ardiente, n
     ],
     duracion: "45-60 min consulta inicial",
     precioDesde: "$150.000 COP",
+  },
+  {
+    slug: "bichectomia",
+    titulo: "Bichectomía",
+    descripcionCorta: "Remodelación facial reduciendo las bolas de Bichat para afinar el contorno del rostro.",
+    descripcionLarga: `La bichectomía es un procedimiento estético que consiste en la extracción quirúrgica de las bolas de Bichat (cuerpos grasos de la mejilla), logrando un rostro más estilizado y definido. En OdontoCúcuta la realizamos con técnica mínimamente invasiva, bajo anestesia local y sedación consciente.
+
+Es un procedimiento ambulatorio, con recuperación rápida y cicatrices invisibles (acceso intraoral). Evaluamos el perfil facial y el volumen de las bolas de Bichat para recomendar la cantidad ideal a extraer y obtener un resultado natural y armónico.`,
+    imagen: "/images/servicios/bichectomia.jpg",
+    icono: "Smile",
+    caracteristicas: [
+      "Remodelación del contorno facial",
+      "Técnica mínimamente invasiva intraoral",
+      "Anestesia local y sedación consciente",
+      "Procedimiento ambulatorio",
+      "Recuperación rápida y cicatrices invisibles",
+      "Resultado natural y armónico",
+    ],
+    beneficios: [
+      "Rostro más estilizado y definido",
+      "Procedimiento seguro y de bajo riesgo",
+      "Sin cicatrices externas visibles",
+      "Resultados permanentes",
+    ],
+    duracion: "45-60 min",
+    precioDesde: "$1.200.000 COP",
+  },
+  {
+    slug: "odontologia-laser",
+    titulo: "Odontología Láser",
+    descripcionCorta: "Tratamientos con láser de diodo para procedimientos indoloros, precisos y de rápida recuperación.",
+    descripcionLarga: `La odontología láser utiliza tecnología de láser de diodo para realizar procedimientos con mayor precisión, menos dolor y una recuperación más rápida. En OdontoCúcuta la aplicamos en blanqueamiento dental, cirugía de tejidos blandos, gingivectomías, frenectomías, tratamiento de aftas y herpes, y desinfección de bolsas periodontales.
+
+Al ser un procedimiento mínimamente invasivo, generalmente no requiere anestesia en muchos casos, reduce el sangrado y el trauma de los tejidos, y mejora la experiencia del paciente.`,
+    imagen: "/images/servicios/odontologia-laser.jpg",
+    icono: "Zap",
+    caracteristicas: [
+      "Blanqueamiento dental asistido por láser",
+      "Gingivectomía y cirugía de tejidos blandos",
+      "Frenectomía láser",
+      "Tratamiento de aftas, herpes y lesiones",
+      "Desinfección de bolsas periodontales",
+      "Menos dolor, sangrado y trauma",
+    ],
+    beneficios: [
+      "Procedimientos indoloros en su mayoría",
+      "Mayor precisión y menor daño tisular",
+      "Recuperación más rápida",
+      "Reduce la necesidad de anestesia",
+    ],
+    duracion: "30-60 min según tratamiento",
+    precioDesde: "$120.000 COP",
   },
 ]
 
@@ -680,7 +752,7 @@ export const testimonios: Testimonio[] = [
 
 export const estadisticas: Estadistica[] = [
   { label: "Pacientes atendidos", valor: "45,000+", icono: "Users" },
-  { label: "Años de experiencia", valor: "25+", icono: "Award" },
+  { label: "Años de experiencia", valor: "30+", icono: "Award" },
   { label: "Especialistas certificados", valor: "12", icono: "GraduationCap" },
   { label: "Sedes en Norte de Santander", valor: "4", icono: "MapPin" },
   { label: "Implantes colocados", valor: "3,200+", icono: "Bone" },
