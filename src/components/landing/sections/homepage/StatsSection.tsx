@@ -4,7 +4,7 @@ import { Shield } from "lucide-react"
 
 export function StatsSection() {
   return (
-    <AnimatedSection className="section-padding bg-surface border-y border-border">
+    <AnimatedSection className="section-padding bg-surface">
       <div className="container-main">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {estadisticas.map((stat) => {

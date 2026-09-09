@@ -19,7 +19,7 @@ const razonesElegir = [
 
 export function PorQueElegirnos() {
   return (
-    <AnimatedSection className="section-padding bg-surface border-y border-border">
+    <AnimatedSection className="section-padding bg-surface">
       <div className="container-main">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div>

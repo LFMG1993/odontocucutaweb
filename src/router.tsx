@@ -11,7 +11,21 @@ import { BlogDetallePage } from "@/pages/BlogDetallePage"
 import { NotFoundPage } from "@/pages/NotFoundPage"
 import LandingPage2 from "@/pages/Landing2"
 
+// Portal Profesionales
+import {
+  DoctorLayout,
+  ProtectedDoctorRoute,
+} from "@/components/profesionales"
+import {
+  DoctorLoginPage,
+  DoctorDashboardPage,
+  DoctorPagosPage,
+  DoctorAcuerdosPage,
+  DoctorPerfilPage,
+} from "@/pages/profesionales"
+
 export const routes: RouteObject[] = [
+  // Rutas Públicas de la Clínica Odontológica
   {
     path: "/",
     element: <MainLayout />,
@@ -27,5 +41,26 @@ export const routes: RouteObject[] = [
       { path: "blog/:slug", element: <BlogDetallePage /> },
       { path: "contacto", element: <ContactoPage /> },
     ],
+  },
+  // Portal de Profesionales OdontoSync
+  {
+    path: "/profesionales",
+    element: (
+      <ProtectedDoctorRoute>
+        <DoctorLayout />
+      </ProtectedDoctorRoute>
+    ),
+    errorElement: <NotFoundPage />,
+    children: [
+      { index: true, element: <DoctorDashboardPage /> },
+      { path: "pagos", element: <DoctorPagosPage /> },
+      { path: "acuerdos", element: <DoctorAcuerdosPage /> },
+      { path: "perfil", element: <DoctorPerfilPage /> },
+    ],
+  },
+  {
+    path: "/profesionales/login",
+    element: <DoctorLoginPage />,
+    errorElement: <NotFoundPage />,
   },
 ]

@@ -22,6 +22,12 @@ import {
   CheckCircle,
   Sparkles,
   Star,
+  Menu,
+  X,
+  Phone,
+  Mail,
+  ChevronDown,
+  Clock,
 } from "lucide-react"
 
 // Iconos personalizados
@@ -58,6 +64,12 @@ export const icons = {
   checkCircle: CheckCircle,
   sparkles: Sparkles,
   star: Star,
+  menu: Menu,
+  x: X,
+  phone: Phone,
+  mail: Mail,
+  chevronDown: ChevronDown,
+  clock: Clock,
 } as const
 
 export type IconName = keyof typeof icons

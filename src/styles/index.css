@@ -56,3 +56,52 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Smooth entry animation for portals and dynamic components */
+@keyframes fadeInEntry {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-entry {
+  animation: fadeInEntry 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* FlipCard 3D helpers */
+.backface-hidden {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.transform-3d {
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+@keyframes flip-y {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(180deg); }
+}
+@keyframes flip-y-back {
+  from { transform: rotateY(180deg); }
+  to   { transform: rotateY(0deg); }
+}
+@keyframes flip-x {
+  from { transform: rotateX(0deg); }
+  to   { transform: rotateX(180deg); }
+}
+@keyframes flip-x-back {
+  from { transform: rotateX(180deg); }
+  to   { transform: rotateX(0deg); }
+}
+
+.animate-flip-y { animation: flip-y 0.6s forwards; }
+.animate-flip-y-back { animation: flip-y-back 0.6s forwards; }
+.animate-flip-x { animation: flip-x 0.6s forwards; }
+.animate-flip-x-back { animation: flip-x-back 0.6s forwards; }

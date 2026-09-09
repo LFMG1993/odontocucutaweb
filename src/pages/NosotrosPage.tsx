@@ -45,7 +45,7 @@ export function NosotrosPage() {
       </section>
 
       {/* Historia / Timeline */}
-      <section className="section-padding bg-surface border-y border-border">
+      <section className="section-padding bg-surface">
         <div className="container-main">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4">Nuestra Historia</h2>
@@ -94,7 +94,7 @@ export function NosotrosPage() {
       </section>
 
       {/* Equipo Médico */}
-      <section className="section-padding bg-surface border-y border-border">
+      <section className="section-padding bg-surface">
         <div className="container-main">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4">Equipo Médico Especialista</h2>

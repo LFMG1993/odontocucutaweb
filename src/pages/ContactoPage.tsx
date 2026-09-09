@@ -311,7 +311,7 @@ export function ContactoPage() {
       </section>
 
       {/* Convenios */}
-      <section className="section-padding bg-surface border-y border-border">
+      <section className="section-padding bg-surface">
         <div className="container-main">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="font-heading text-2xl sm:text-3xl font-bold mb-4">Convenios y Financiación</h2>

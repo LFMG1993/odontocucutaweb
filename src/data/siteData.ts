@@ -1,5 +1,14 @@
-import type { Servicio, EquipoMedico, BlogPost, Sede, Convenio, Testimonio, Estadistica } from "@/types"
+import type { Servicio, EquipoMedico, BlogPost, Sede, Convenio, Testimonio, Estadistica, Afiliacion } from "@/types"
 import { Shield, Zap, Headphones, Truck, Users, Award, GraduationCap, MapPin, Smile, AlignCenterHorizontal, Bone, Microscope, Baby, Puzzle, HeartPulse, Brain } from "lucide-react"
+import img1 from "@/assets/images/1.webp"
+import img2 from "@/assets/images/2.webp"
+import img3 from "@/assets/images/3.webp"
+import img4 from "@/assets/images/4.webp"
+import img5 from "@/assets/images/5.webp"
+import img6 from "@/assets/images/6.webp"
+import img7 from "@/assets/images/7.webp"
+import img8 from "@/assets/images/8.webp"
+import img9 from "@/assets/images/9.webp"
 
 export const iconMap = {
   Shield,
@@ -28,7 +37,7 @@ export const servicios: Servicio[] = [
     descripcionLarga: `La odontología general es la base de la salud bucal. En Odontocúcuta nos especializamos en la prevención, diagnóstico y tratamiento de las enfermedades dentales más comunes. Nuestro equipo de odontólogos generales realiza desde limpiezas profesionales y fluorizaciones hasta restauraciones estéticas con resinas compuestas de última generación, coronas, puentes y prótesis removibles.
 
 Contamos con tecnología de vanguardia como radiografía digital, cámaras intraorales y sistemas de aislamiento absoluto para garantizar tratamientos precisos, cómodos y duraderos. Nuestro enfoque preventivo busca detectar problemas a tiempo y evitar tratamientos más complejos y costosos.`,
-    imagen: "/images/servicios/odontologia-general.jpg",
+    imagen: img1,
     icono: "Tooth",
     caracteristicas: [
       "Limpiezas profesionales y profilaxis",
@@ -57,7 +66,7 @@ Contamos con tecnología de vanguardia como radiografía digital, cámaras intra
     descripcionLarga: `La cirugía maxilofacial aborda patologías complejas de la cavidad oral, maxilares, mandíbula y estructuras faciales. Nuestros cirujanos maxilofaciales certificados realizan desde exodoncias complejas (cordales incluidos, dientes supernumerarios) hasta cirugía ortognática, reconstrucción ósea, implantes cigomáticos y tratamiento de traumatismos faciales.
 
 Contamos con quirófano propio equipado con monitorización completa, piezocirugía ultrasónica para osteotomías precisas, y sedación consciente endovenosa supervisada por anestesiólogo para máxima seguridad y confort del paciente.`,
-    imagen: "/images/servicios/cirugia-maxilofacial.jpg",
+    imagen: img2,
     icono: "Scalpel",
     caracteristicas: [
       "Exodoncias complejas e incluidos (cordales)",
@@ -86,7 +95,7 @@ Contamos con quirófano propio equipado con monitorización completa, piezocirug
     descripcionLarga: `La ortodoncia no solo alinea dientes, corrige la mordida, mejora la función masticatoria, la fonación y la estética facial. En Odontocúcuta ofrecemos tratamientos para niños, adolescentes y adultos con las técnicas más avanzadas: brackets autoligables (Damon), brackets estéticos de zafiro, alineadores invisibles (Invisalign, Spark) y ortodoncia lingual.
 
 Nuestro ortodoncista certificado realiza diagnóstico 3D con escáner intraoral iTero, CBCT y cefalometría digital para planificación precisa. Tratamos apiñamientos, diastemas, mordida abierta, cruzada, profunda, prognatismo y retrognatia.`,
-    imagen: "/images/servicios/ortodoncia.jpg",
+    imagen: img3,
     icono: "Smile",
     caracteristicas: [
       "Brackets metálicos autoligables (Damon System)",
@@ -115,7 +124,7 @@ Nuestro ortodoncista certificado realiza diagnóstico 3D con escáner intraoral 
     descripcionLarga: `Los implantes dentales son la solución gold standard para reemplazar dientes perdidos. En Odontocúcuta realizamos cirugía guiada por navegación 3D (X-Guide, Navident) para máxima precisión, mínima invasividad y resultados predecibles. Trabajamos con sistemas de implantes premium (Straumann, Nobel Biocare, Zimmer Biomet) con superficies SLActive/TiUnite para osteointegración acelerada.
 
 Ofrecemos desde implante unitario hasta rehabilitaciones completas All-on-4/All-on-6, carga inmediata, elevación de seno maxilar (técnica crestal y lateral), injertos óseos en bloque, regeneración guiada (GBR) y tejido conectivo.`,
-    imagen: "/images/servicios/implantologia.jpg",
+    imagen: img4,
     icono: "Bone",
     caracteristicas: [
       "Implante unitario con corona atornillada",
@@ -144,7 +153,7 @@ Ofrecemos desde implante unitario hasta rehabilitaciones completas All-on-4/All-
     descripcionLarga: `La endodoncia (tratamiento de conductos) salva dientes con pulpa inflamada o necrótica por caries profunda, traumatismos o fracturas. Nuestros endodoncistas usan microscopio operatorio (hasta 25x), localizadores apicales electrónicos, sistemas rotatorios de níquel-titanio, irrigación activada por ultrasonido y láser para desinfección 3D del sistema de conductos.
 
 Realizamos retratamientos endodónticos, cirugía apical (apicectomía), tratamiento de reabsorciones, perforaciones y dientes con anatomía compleja (conductos calcificados, curvaturas severas, conductos accesorios).`,
-    imagen: "/images/servicios/endodoncia.jpg",
+    imagen: img5,
     icono: "Microscope",
     caracteristicas: [
       "Tratamiento de conductos en una o varias sesiones",
@@ -173,7 +182,7 @@ Realizamos retratamientos endodónticos, cirugía apical (apicectomía), tratami
     descripcionLarga: `La odontopediatría establece las bases de una salud bucal para toda la vida. Nuestros odontopediatras certificados manejan técnicas de conducta (Tell-Show-Do, modelado, refuerzo positivo), sedación consciente con óxido nitroso y anestesia general en quirófano para casos complejos.
 
 Nuestro espacio infantil está diseñado para que los niños se sientan seguros y entretenidos. Educamos a padres en higiene, alimentación, hábitos (chupete, biberón, succión digital) y prevención temprana. Programa "Primer Diente, Primera Visita" antes del año de edad.`,
-    imagen: "/images/servicios/odontopediatria.jpg",
+    imagen: img6,
     icono: "Baby",
     caracteristicas: [
       "Primera visita y control de erupción (0-3 años)",
@@ -204,7 +213,7 @@ Nuestro espacio infantil está diseñado para que los niños se sientan seguros 
     descripcionLarga: `La rehabilitación oral integra múltiples especialidades para restaurar bocas muy deterioradas. Nuestros prostodoncistas diseñan sonrisas con Digital Smile Design (DSD), mock-up guiado y cerámicas de alta estética (E.max, zirconia multicapa, feldespática). Trabajamos con laboratorio digital propio (CAD/CAM, fresado 5 ejes, impresión 3D) para precisión milimétrica.
 
 Rehabilitamos desde una corona unitaria hasta arcadas completas: coronas, veneers, incrustaciones, puentes, prótesis híbridas (Toronto), sobredentaduras sobre locators/barras, y prótesis totales con estética natural (dientes BIOFORM, encía caracterizada).`,
-    imagen: "/images/servicios/rehabilitacion-oral.jpg",
+    imagen: img7,
     icono: "Puzzle",
     caracteristicas: [
       "Carillas de porcelana (veneers) y lentes de contacto",
@@ -234,7 +243,7 @@ Rehabilitamos desde una corona unitaria hasta arcadas completas: coronas, veneer
     descripcionLarga: `La periodoncia trata las enfermedades que afectan encía, ligamento periodontal y hueso alveolar. La periodontitis es la principal causa de pérdida dental en adultos y está vinculada a enfermedades sistémicas (diabetes, cardiovasculares, parto prematuro). Nuestros periodoncistas realizan desde raspado y alisado radicular (curetaje) hasta cirugía regenerativa con Emdogain, PRF, membranas de colágeno y injertos óseos.
 
 Tratamos recesiones gingivales con técnicas de túnel e injerto de tejido conectivo, alargamiento coronario estético y funcional, gingivectomía láser, y mantenimiento periodontal de por vida (SPT).`,
-    imagen: "/images/servicios/periodoncia.jpg",
+    imagen: img8,
     icono: "HeartPulse",
     caracteristicas: [
       "Raspado y alisado radicular (curetaje) ultrasonico",
@@ -264,7 +273,7 @@ Tratamos recesiones gingivales con técnicas de túnel e injerto de tejido conec
     descripcionLarga: `La estomatología / medicina oral aborda patologías de la mucosa bucal, glándulas salivales, trastornos de la articulación temporomandibular (ATM), dolor orofacial crónico, bruxismo, apnea del sueño y manifestaciones orales de enfermedades sistémicas. Nuestro estomatólogo realiza biopsias, exfoliativas, pruebas de alergia a materiales dentales y manejo multidisciplinario.
 
 Tratamos liquen plan oral, candidiasis recurrente, síndrome de boca ardiente, neuralgias trigémino, disfunción temporomandibular (DTM), cefaleas tensionales, y screening de cáncer oral con VELscope.`,
-    imagen: "/images/servicios/estomatologia.jpg",
+    imagen: img9,
     icono: "Brain",
     caracteristicas: [
       "Diagnóstico de lesiones de mucosa oral (biopsia)",
@@ -294,7 +303,7 @@ Tratamos liquen plan oral, candidiasis recurrente, síndrome de boca ardiente, n
     descripcionLarga: `La bichectomía es un procedimiento estético que consiste en la extracción quirúrgica de las bolas de Bichat (cuerpos grasos de la mejilla), logrando un rostro más estilizado y definido. En OdontoCúcuta la realizamos con técnica mínimamente invasiva, bajo anestesia local y sedación consciente.
 
 Es un procedimiento ambulatorio, con recuperación rápida y cicatrices invisibles (acceso intraoral). Evaluamos el perfil facial y el volumen de las bolas de Bichat para recomendar la cantidad ideal a extraer y obtener un resultado natural y armónico.`,
-    imagen: "/images/servicios/bichectomia.jpg",
+    imagen: img1,
     icono: "Smile",
     caracteristicas: [
       "Remodelación del contorno facial",
@@ -320,7 +329,7 @@ Es un procedimiento ambulatorio, con recuperación rápida y cicatrices invisibl
     descripcionLarga: `La odontología láser utiliza tecnología de láser de diodo para realizar procedimientos con mayor precisión, menos dolor y una recuperación más rápida. En OdontoCúcuta la aplicamos en blanqueamiento dental, cirugía de tejidos blandos, gingivectomías, frenectomías, tratamiento de aftas y herpes, y desinfección de bolsas periodontales.
 
 Al ser un procedimiento mínimamente invasivo, generalmente no requiere anestesia en muchos casos, reduce el sangrado y el trauma de los tejidos, y mejora la experiencia del paciente.`,
-    imagen: "/images/servicios/odontologia-laser.jpg",
+    imagen: img2,
     icono: "Zap",
     caracteristicas: [
       "Blanqueamiento dental asistido por láser",
@@ -693,6 +702,52 @@ export const convenios: Convenio[] = [
   { id: "10", nombre: "Addi / Kueski Pay", logo: "/images/convenios/addi.svg", descripcion: "Compra ahora, paga después (BNPL) en 3-12 cuotas sin interés." },
 ]
 
+export const afiliaciones: Afiliacion[] = [
+  {
+    id: "plan-oro",
+    nombre: "Plan Oro",
+    nivel: "oro",
+    precioMensual: "$129.900 / mes",
+    descripcion: "La suscripción más completa con los mayores descuentos y beneficios exclusivos para tu salud bucal.",
+    destacado: true,
+    beneficios: [
+      "Hasta 30% de descuento en todos los tratamientos",
+      "Valoración general y diagnóstico sin costo (2 veces al año)",
+      "Limpieza dental profesional incluida cada 6 meses",
+      "Ortodoncia e implantes con descuento preferencial",
+      "Soporte prioritario y agendamiento de citas inmediato",
+      "Miembro del titular + hasta 3 beneficiarios",
+    ],
+  },
+  {
+    id: "plan-plata",
+    nombre: "Plan Plata",
+    nivel: "plata",
+    precioMensual: "$89.900 / mes",
+    descripcion: "El equilibrio perfecto entre beneficios y precio para mantener una sonrisa saludable todo el año.",
+    beneficios: [
+      "Hasta 20% de descuento en tratamientos",
+      "Valoración general y diagnóstico sin costo (1 vez al año)",
+      "Limpieza dental profesional incluida 1 vez al año",
+      "Descuentos en ortodoncia y estética dental",
+      "Miembro del titular + 1 beneficiario",
+    ],
+  },
+  {
+    id: "plan-bronce",
+    nombre: "Plan Bronce",
+    nivel: "bronce",
+    precioMensual: "$49.900 / mes",
+    descripcion: "Acceso a precios preferenciales y descuentos base para empezar a cuidar tu salud bucal.",
+    beneficios: [
+      "Hasta 10% de descuento en tratamientos",
+      "Valoración general y diagnóstico con descuento",
+      "Tarifas preferenciales en urgencias",
+      "Plan individual",
+    ],
+  },
+]
+
 export const testimonios: Testimonio[] = [
   {
     id: "1",
@@ -753,7 +808,7 @@ export const testimonios: Testimonio[] = [
 export const estadisticas: Estadistica[] = [
   { label: "Pacientes atendidos", valor: "45,000+", icono: "Users" },
   { label: "Años de experiencia", valor: "30+", icono: "Award" },
-  { label: "Especialistas certificados", valor: "12", icono: "GraduationCap" },
+  { label: "Especialistas certificados", valor: "12+", icono: "GraduationCap" },
   { label: "Sedes en Norte de Santander", valor: "4", icono: "MapPin" },
   { label: "Implantes colocados", valor: "3,200+", icono: "Bone" },
   { label: "Sonrisas diseñadas (DSD)", valor: "1,800+", icono: "Smile" },

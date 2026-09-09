@@ -6,9 +6,9 @@ import { useCitaModal } from "@/context/CitaModalContext"
 export function HeroSection() {
   const { openCitaModal } = useCitaModal()
   return (
-    <section className="relative overflow-hidden bg-linear-to-br from-background via-surface to-primary/5">
+    <section className="relative overflow-hidden bg-linear-to-br from-background via-surface to-primary/5 flex min-h-svh items-center">
       <div className="absolute inset-0 bg-[url('/images/hero-pattern.svg')] opacity-5" aria-hidden="true" />
-      <div className="container-main relative py-24 lg:py-40">
+      <div className="container-main relative w-full py-24 pt-32 lg:py-32">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
             <Sparkles className="w-4 h-4" aria-hidden="true" />
@@ -22,12 +22,12 @@ export function HeroSection() {
             Odontología integral de alta complejidad con tecnología 3D, especialistas certificados y trato humano.
             Recupera tu salud, función y estética dental en un solo lugar.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Button size="xl" onClick={openCitaModal} className="w-full sm:w-auto">
               Agendar Mi Cita <ArrowRight className="w-5 h-5 ml-2" aria-hidden="true" />
             </Button>
             <Button size="xl" variant="outline" asChild className="w-full sm:w-auto">
-              <Link to="/servicios">Ver Nuestros Servicios</Link>
+              <Link to="/servicios">Ver Nuestras Especialidades</Link>
             </Button>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-text-muted">
@@ -37,7 +37,7 @@ export function HeroSection() {
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-primary" aria-hidden="true" />
-              <span>Financiación 0% interés hasta 24 meses</span>
+              <span>Financiación hasta 36 meses</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-primary" aria-hidden="true" />

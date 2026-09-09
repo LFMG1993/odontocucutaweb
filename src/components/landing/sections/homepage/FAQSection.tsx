@@ -24,7 +24,7 @@ const faqs = [
 export function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
   return (
-    <AnimatedSection className="section-padding bg-surface border-y border-border">
+    <AnimatedSection id="faq" className="section-padding bg-surface">
       <div className="container-main max-w-4xl">
         <div className="text-center mb-16">
           <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4">Preguntas Frecuentes</h2>

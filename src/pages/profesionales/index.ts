@@ -1,0 +1,5 @@
+export * from './DoctorLoginPage'
+export * from './DoctorDashboardPage'
+export * from './DoctorPagosPage'
+export * from './DoctorAcuerdosPage'
+export * from './DoctorPerfilPage'

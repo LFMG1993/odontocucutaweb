@@ -31,7 +31,7 @@ const YoutubeIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 const footerLinks = {
   nosotros: [
-    { label: "Quiénes Somos", href: "/nosotros" },
+    { label: "Quién Somos", href: "/nosotros" },
     { label: "Misión y Visión", href: "/nosotros#mision-vision" },
     { label: "Nuestro Equipo", href: "/nosotros#equipo" },
     { label: "Certificaciones", href: "/nosotros#certificaciones" },
@@ -231,15 +231,29 @@ export function Footer() {
 
         {/* Bottom footer */}
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-text-muted text-sm">
-            © {new Date().getFullYear()} Odontocúcuta S.A. Todos los derechos reservados.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm text-text-muted text-center sm:text-left">
+            <p>
+              © {new Date().getFullYear()} Odontocúcuta S.A. Todos los derechos reservados.
+            </p>
+            <span className="hidden sm:inline text-white/20">•</span>
+            <p className="text-xs sm:text-sm">
+              Creado y Desarrollado por{" "}
+              <a
+                href="https://molink.com.co"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-primary font-semibold transition-colors underline decoration-white/30 underline-offset-4 hover:decoration-primary"
+              >
+                Molink Tecnologia
+              </a>
+            </p>
+          </div>
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-text-muted">
             <Link to="/contacto" className="hover:text-primary transition-colors">Términos y Condiciones</Link>
             <Link to="/contacto" className="hover:text-primary transition-colors">Política de Privacidad</Link>
           </div>
           <button
-            className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-white hover:bg-primary transition-colors"
+            className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-white hover:bg-primary transition-colors shrink-0"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             aria-label="Volver arriba"
           >

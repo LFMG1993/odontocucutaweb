@@ -5,7 +5,6 @@ import {
   PorQueElegirnos,
   TestimoniosSection,
   FAQSection,
-  CTASection,
 } from "@/components/landing/sections/homepage"
 import { SEO } from "@/components/shared"
 
@@ -23,7 +22,6 @@ export function HomePage() {
       <PorQueElegirnos />
       <TestimoniosSection />
       <FAQSection />
-      <CTASection />
     </div>
   )
 }

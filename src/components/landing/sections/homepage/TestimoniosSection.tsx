@@ -5,7 +5,7 @@ import { Star } from "lucide-react"
 
 export function TestimoniosSection() {
   return (
-    <AnimatedSection className="section-padding">
+    <AnimatedSection className="section-padding bg-background">
       <div className="container-main">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4">Lo que dicen nuestros pacientes</h2>

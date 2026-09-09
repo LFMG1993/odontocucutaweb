@@ -75,7 +75,7 @@ export function ServiciosPage() {
       </section>
 
       {/* Detalle de cada servicio */}
-      <section className="section-padding bg-surface border-y border-border">
+      <section className="section-padding bg-surface">
         <div className="container-main">
           {servicios.map((servicio, index) => {
             const Icon = iconMap[servicio.icono as keyof typeof iconMap] || Smile
