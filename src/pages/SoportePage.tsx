@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
-  ShieldCheck,
   RotateCcw,
   AlertCircle,
-  Clock,
-  Server,
 } from 'lucide-react'
 import { useSoporte } from '@/hooks/soporte'
 import { SoporteForm, EquipoBanner, TicketExito } from '@/components/soporte'
