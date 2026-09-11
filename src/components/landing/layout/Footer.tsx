@@ -59,6 +59,8 @@ const footerLinks = {
     { label: "Pide tu Cita", href: "/cita" },
     { label: "Contacto", href: "/contacto" },
     { label: "Blog", href: "/blog" },
+    { label: "Mesa de Ayuda TI", href: "/soporte" },
+    { label: "Portal Profesionales", href: "/profesionales/login" },
   ],
 }
 

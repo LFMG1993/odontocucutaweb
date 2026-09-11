@@ -30,8 +30,9 @@ const navLinks: NavItem[] = [
   {
     label: "Servicios",
     items: [
-      { label: "Convenios", href: "/contacto"},
+      { label: "Convenios", href: "/contacto" },
       { label: "Blog", href: "/blog" },
+      { label: "Mesa de Ayuda TI", href: "/soporte", detail: "Reporte de incidencias técnicas y equipos" },
       { label: "Preguntas Frecuentes", href: "/faq" },
     ],
   },

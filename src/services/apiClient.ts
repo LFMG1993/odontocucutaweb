@@ -86,7 +86,7 @@ async function request<T>(
     }
 
     if (!response.ok) {
-      const dataObj = responseData as { error?: string; message?: string } | null
+      const dataObj = responseData as { error?: string; message?: string; errors?: Record<string, string> } | null
       const errorMessage =
         dataObj?.error || dataObj?.message || `Error HTTP ${response.status}: ${response.statusText}`
       throw new ApiError(errorMessage, response.status, responseData)
@@ -124,9 +124,10 @@ export const apiClient = {
     body?: unknown,
     config?: RequestConfig
   ): Promise<ApiClientResponse<T>> => {
+    const isFormData = typeof FormData !== 'undefined' && body instanceof FormData
     return request<T>(endpoint, {
       method: 'POST',
-      body: body ? JSON.stringify(body) : undefined,
+      body: isFormData ? (body as FormData) : (body ? JSON.stringify(body) : undefined),
       params: config?.params,
       headers: config?.headers,
       signal: config?.signal,
@@ -138,9 +139,10 @@ export const apiClient = {
     body?: unknown,
     config?: RequestConfig
   ): Promise<ApiClientResponse<T>> => {
+    const isFormData = typeof FormData !== 'undefined' && body instanceof FormData
     return request<T>(endpoint, {
       method: 'PUT',
-      body: body ? JSON.stringify(body) : undefined,
+      body: isFormData ? (body as FormData) : (body ? JSON.stringify(body) : undefined),
       params: config?.params,
       headers: config?.headers,
       signal: config?.signal,
