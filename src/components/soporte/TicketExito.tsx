@@ -10,6 +10,7 @@ import { Button } from '@/components/shared'
 
 interface TicketExitoProps {
   ticketUuid: string
+  ticketId?: number | string
   solicitante: string
   sede: string
   motivo: string
@@ -18,6 +19,7 @@ interface TicketExitoProps {
 
 export const TicketExito: React.FC<TicketExitoProps> = ({
   ticketUuid,
+  ticketId,
   solicitante,
   sede,
   motivo,
@@ -25,16 +27,21 @@ export const TicketExito: React.FC<TicketExitoProps> = ({
 }) => {
   const [copiado, setCopiado] = React.useState(false)
 
-  const shortCode = ticketUuid.slice(0, 8).toUpperCase()
+  // Usar el ticketId si existe, sino fallback al sufijo del UUID
+  const shortCode = ticketId ? String(ticketId) : ticketUuid.slice(0, 8).toUpperCase()
 
   const handleCopiar = () => {
-    navigator.clipboard.writeText(ticketUuid)
+    navigator.clipboard.writeText(ticketId ? String(ticketId) : ticketUuid)
     setCopiado(true)
     setTimeout(() => setCopiado(false), 2000)
   }
 
   const whatsappText = encodeURIComponent(
-    `Hola equipo de Soporte TI OdontoCúcuta. Reporté la incidencia #${shortCode} (${motivo}) en la ${sede} a nombre de ${solicitante}. UUID: ${ticketUuid}`
+    `Hola equipo de Soporte TI OdontoCúcuta. He reportado una incidencia técnica:\n\n` +
+    `*Radicado:* #${shortCode}\n` +
+    `*Sede:* ${sede}\n` +
+    `*Solicitante:* ${solicitante}\n` +
+    `*Motivo:* ${motivo}`
   )
 
   return (
@@ -71,7 +78,7 @@ export const TicketExito: React.FC<TicketExitoProps> = ({
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-blue-700 transition-colors shadow-xs cursor-pointer"
           >
             {copiado ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copiado ? '¡Copiado!' : 'Copiar UUID'}</span>
+            <span>{copiado ? '¡Copiado!' : (ticketId ? 'Copiar Ticket ID' : 'Copiar')}</span>
           </button>
         </div>
 
@@ -85,16 +92,18 @@ export const TicketExito: React.FC<TicketExitoProps> = ({
           <p>
             <strong className="text-slate-900 font-semibold">Motivo:</strong> {motivo}
           </p>
-          <p className="font-mono text-[11px] text-slate-400 truncate pt-1">
-            UUID: {ticketUuid}
-          </p>
+          {!ticketId && (
+            <p className="font-mono text-[11px] text-slate-400 truncate pt-1">
+              UUID: {ticketUuid}
+            </p>
+          )}
         </div>
       </div>
 
       {/* Acciones Rápidas */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
         <a
-          href={`https://wa.me/573181441442?text=${whatsappText}`}
+          href={`https://wa.me/573155756600?text=${whatsappText}`}
           target="_blank"
           rel="noopener noreferrer"
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md shadow-emerald-600/20"
