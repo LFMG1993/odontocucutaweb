@@ -11,7 +11,6 @@ import {
   Clock,
   Sparkles,
   CheckCircle,
-  MessageSquare,
   Search,
   Check,
   ChevronDown,
@@ -39,6 +38,31 @@ const PRIORIDADES: { id: TicketPrioridad; label: string; color: string; desc: st
   { id: 'alta', label: 'Alta', color: 'border-amber-200 text-amber-700 bg-amber-50/60', desc: 'Afecta operación de sede' },
   { id: 'urgente', label: 'Urgente', color: 'border-red-200 text-red-700 bg-red-50/60', desc: 'Servicio detenido totalmente' },
 ]
+
+// Orden en el que se validan y se navega a los campos obligatorios
+const FIELD_ORDER = ['solicitante', 'sede', 'motivo', 'descripcion'] as const
+
+const FIELD_LABELS: Record<(typeof FIELD_ORDER)[number], string> = {
+  solicitante: 'Nombre completo',
+  sede: 'Sede',
+  motivo: 'Motivo de la solicitud',
+  descripcion: 'Descripción de la falla',
+}
+
+/** Burbuja informativa que aparece justo debajo del campo que falta completar. */
+const ErrorBubble: React.FC<{ message: string }> = ({ message }) => (
+  <div
+    role="alert"
+    className="relative mt-2 flex items-start gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[11px] font-semibold text-red-700 shadow-sm animate-fade-in-entry"
+  >
+    <span
+      aria-hidden="true"
+      className="absolute -top-[5px] left-4 h-2.5 w-2.5 rotate-45 border-l border-t border-red-200 bg-red-50"
+    />
+    <AlertCircle className="mt-px h-3.5 w-3.5 shrink-0 text-red-500" />
+    <span>{message}</span>
+  </div>
+)
 
 export const SoporteForm: React.FC<SoporteFormProps> = ({
   catalogos,
@@ -90,15 +114,20 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
   const [motivo, setMotivo] = useState<string>('')
   const [prioridad, setPrioridad] = useState<TicketPrioridad>('media')
   const [descripcion, setDescripcion] = useState<string>('')
-  const [mensajeWhatsapp, setMensajeWhatsapp] = useState<string>('')
+  const [mensajeWhatsapp] = useState<string>('')
   const [archivo, setArchivo] = useState<File | null>(null)
   const [archivoError, setArchivoError] = useState<string | null>(null)
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({})
+  const [toast, setToast] = useState<string | null>(null)
+  const toastTimer = useRef<number | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const solicitanteRef = useRef<HTMLInputElement>(null)
+  const sedeRef = useRef<HTMLSelectElement>(null)
+  const motivoRef = useRef<HTMLSelectElement>(null)
+  const descripcionRef = useRef<HTMLTextAreaElement>(null)
 
-  // Sincronizar si el equipo precargado incluye un usuario Dentalink asignado
   useEffect(() => {
     if (equipoUsuarioDl) {
       setSelectedUsuarioId(equipoUsuarioDl.id_usuario_dl ? String(equipoUsuarioDl.id_usuario_dl) : '')
@@ -115,7 +144,6 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
     }
   }, [equipoUsuarioDl, catalogos.equipo])
 
-  // Cerrar dropdown al hacer click afuera
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -125,6 +153,35 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current) window.clearTimeout(toastTimer.current)
+    }
+  }, [])
+
+  const showToast = (message: string) => {
+    setToast(message)
+    if (toastTimer.current) window.clearTimeout(toastTimer.current)
+    toastTimer.current = window.setTimeout(() => setToast(null), 5000)
+  }
+
+  /** Lleva al usuario hasta el campo con error y lo enfoca para que pueda corregirlo. */
+  const focusField = (field: (typeof FIELD_ORDER)[number]) => {
+    const refs: Record<string, { current: HTMLElement | null }> = {
+      solicitante: solicitanteRef,
+      sede: sedeRef,
+      motivo: motivoRef,
+      descripcion: descripcionRef,
+    }
+    const element = refs[field]?.current
+    if (!element) return
+
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    window.setTimeout(() => {
+      element.focus({ preventScroll: true })
+    }, 350)
+  }
 
   // Filtrado rápido de usuarios
   const filteredUsuarios = useMemo(() => {
@@ -165,7 +222,6 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
     setSolicitante('')
   }
 
-  // Manejo de archivo adjunto con límite de 10MB y formatos válidos
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setArchivoError(null)
     const file = e.target.files?.[0]
@@ -208,7 +264,17 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
     }
 
     setLocalErrors(errs)
-    if (Object.keys(errs).length > 0) return
+    const invalidFields = FIELD_ORDER.filter((field) => errs[field])
+    if (invalidFields.length > 0) {
+      const missing = invalidFields.map((field) => FIELD_LABELS[field]).join(', ')
+      showToast(
+        invalidFields.length === 1
+          ? `Falta completar: ${missing}`
+          : `Faltan ${invalidFields.length} datos obligatorios: ${missing}`
+      )
+      focusField(invalidFields[0])
+      return
+    }
 
     await onSubmit({
       solicitante: solicitante.trim(),
@@ -228,6 +294,7 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
 
   return (
     <form
+      noValidate
       onSubmit={handleSubmit}
       className="bg-white rounded-3xl border border-slate-800 p-6 sm:p-8 shadow-xl shadow-slate-200/40 space-y-6"
     >
@@ -243,11 +310,6 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
                   : 'Mesa de Ayuda OdontoCucuta'}
               </span>
             </div>
-            <p className="text-xs text-slate-500">
-              {isEquipoMode
-                ? 'Indica el motivo y describe la novedad técnica que presenta el equipo.'
-                : 'Reporte de incidencias técnicas, equipos clínicos y conectividad.'}
-            </p>
           </div>
         </div>
 
@@ -295,7 +357,7 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
           {catalogos.usuarios && catalogos.usuarios.length > 0 && (
             <div className="relative" ref={dropdownRef}>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Buscar Colaborador Dentalink
+                Buscar Usuario
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -380,6 +442,7 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
                 Nombre Completo <small className="text-red-500">*</small>
               </label>
               <input
+                ref={solicitanteRef}
                 type="text"
                 value={solicitante}
                 onChange={(e) => {
@@ -388,20 +451,19 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
                 }}
                 placeholder="Ej: Dra. Daniela Rosales"
                 required
-                className={`w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border bg-slate-50/60 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all ${
-                  getError('solicitante') ? 'border-red-400 bg-red-50/30' : 'border-slate-200'
+                aria-invalid={Boolean(getError('solicitante'))}
+                className={`w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-2 transition-all bg-slate-50/60 focus:bg-white ${
+                  getError('solicitante')
+                    ? 'border-red-400 bg-red-50/30 focus:ring-red-400/60'
+                    : 'border-slate-200 focus:ring-blue-600'
                 }`}
               />
-              {getError('solicitante') && (
-                <p className="mt-1 text-[11px] text-red-600 font-medium flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" /> {getError('solicitante')}
-                </p>
-              )}
+              {getError('solicitante') && <ErrorBubble message={getError('solicitante')} />}
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Teléfono / WhatsApp (Opcional)
+                WhatsApp
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -437,14 +499,18 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
                 Sede Odontocúcuta <small className="text-red-500">*</small>
               </label>
               <select
+                ref={sedeRef}
                 value={sede}
                 onChange={(e) => {
                   setSede(e.target.value)
                   if (localErrors.sede) setLocalErrors((prev) => ({ ...prev, sede: '' }))
                 }}
                 required
-                className={`w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border bg-slate-50/60 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all ${
-                  getError('sede') ? 'border-red-400 bg-red-50/30' : 'border-slate-200'
+                aria-invalid={Boolean(getError('sede'))}
+                className={`w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border bg-slate-50/60 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+                  getError('sede')
+                    ? 'border-red-400 bg-red-50/30 focus:ring-red-400/60'
+                    : 'border-slate-200 focus:ring-blue-600'
                 }`}
               >
                 <option value="">-- Selecciona la sede --</option>
@@ -454,11 +520,7 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
                   </option>
                 ))}
               </select>
-              {getError('sede') && (
-                <p className="mt-1 text-[11px] text-red-600 font-medium flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" /> {getError('sede')}
-                </p>
-              )}
+              {getError('sede') && <ErrorBubble message={getError('sede')} />}
             </div>
 
             <div>
@@ -466,14 +528,18 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
                 Motivo de la Solicitud <small className="text-red-500">*</small>
               </label>
               <select
+                ref={motivoRef}
                 value={motivo}
                 onChange={(e) => {
                   setMotivo(e.target.value)
                   if (localErrors.motivo) setLocalErrors((prev) => ({ ...prev, motivo: '' }))
                 }}
                 required
-                className={`w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border bg-slate-50/60 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all ${
-                  getError('motivo') ? 'border-red-400 bg-red-50/30' : 'border-slate-200'
+                aria-invalid={Boolean(getError('motivo'))}
+                className={`w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border bg-slate-50/60 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+                  getError('motivo')
+                    ? 'border-red-400 bg-red-50/30 focus:ring-red-400/60'
+                    : 'border-slate-200 focus:ring-blue-600'
                 }`}
               >
                 <option value="">-- Selecciona el tipo de falla --</option>
@@ -484,11 +550,7 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
                 ))}
                 <option value="Otro motivo de soporte">Otro motivo técnico no listado</option>
               </select>
-              {getError('motivo') && (
-                <p className="mt-1 text-[11px] text-red-600 font-medium flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" /> {getError('motivo')}
-                </p>
-              )}
+              {getError('motivo') && <ErrorBubble message={getError('motivo')} />}
             </div>
           </div>
 
@@ -537,6 +599,7 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
                 Tipo o Motivo del Requerimiento <small className="text-red-500">*</small>
               </label>
               <select
+                ref={motivoRef}
                 value={motivo}
                 onChange={(e) => {
                   setMotivo(e.target.value)
@@ -544,8 +607,11 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
                 }}
                 required
                 autoFocus={isEquipoMode}
-                className={`w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border bg-slate-50/60 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all ${
-                  getError('motivo') ? 'border-red-400 bg-red-50/30' : 'border-slate-200'
+                aria-invalid={Boolean(getError('motivo'))}
+                className={`w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border bg-slate-50/60 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+                  getError('motivo')
+                    ? 'border-red-400 bg-red-50/30 focus:ring-red-400/60'
+                    : 'border-slate-200 focus:ring-blue-600'
                 }`}
               >
                 <option value="">-- Selecciona qué ocurre con el equipo --</option>
@@ -556,11 +622,7 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
                 ))}
                 <option value="Otro motivo de soporte">Otro motivo técnico no listado</option>
               </select>
-              {getError('motivo') && (
-                <p className="mt-1 text-[11px] text-red-600 font-medium flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" /> {getError('motivo')}
-                </p>
-              )}
+              {getError('motivo') && <ErrorBubble message={getError('motivo')} />}
             </div>
 
             {/* Selector de Prioridad Compacto */}
@@ -610,6 +672,7 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
             <small className="text-red-500">*</small>
           </label>
           <textarea
+            ref={descripcionRef}
             rows={4}
             value={descripcion}
             onChange={(e) => {
@@ -622,30 +685,14 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
                 : 'Describe qué ocurrió, qué mensaje de error aparece en pantalla, o qué equipo no enciende...'
             }
             required
-            className={`w-full text-xs sm:text-sm p-3.5 rounded-xl border bg-slate-50/60 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all resize-none ${
-              getError('descripcion') ? 'border-red-400 bg-red-50/30' : 'border-slate-200'
+            aria-invalid={Boolean(getError('descripcion'))}
+            className={`w-full text-xs sm:text-sm p-3.5 rounded-xl border bg-slate-50/60 focus:outline-none focus:ring-2 focus:bg-white transition-all resize-none ${
+              getError('descripcion')
+                ? 'border-red-400 bg-red-50/30 focus:ring-red-400/60'
+                : 'border-slate-200 focus:ring-blue-600'
             }`}
           />
-          {getError('descripcion') && (
-            <p className="mt-1 text-[11px] text-red-600 font-medium flex items-center gap-1">
-              <AlertCircle className="w-3 h-3" /> {getError('descripcion')}
-            </p>
-          )}
-        </div>
-
-        {/* Nota / Mensaje adicional */}
-        <div>
-          <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
-            <MessageSquare className="w-3.5 h-3.5 text-slate-400" />
-            <span>Mensaje o Nota Adicional (Opcional)</span>
-          </label>
-          <input
-            type="text"
-            value={mensajeWhatsapp}
-            onChange={(e) => setMensajeWhatsapp(e.target.value)}
-            placeholder="Ej: Llamar antes de las 11am o acudir directamente al consultorio"
-            className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all"
-          />
+          {getError('descripcion') && <ErrorBubble message={getError('descripcion')} />}
         </div>
 
         {/* Subida de Archivo Adjunto */}
@@ -724,6 +771,17 @@ export const SoporteForm: React.FC<SoporteFormProps> = ({
           </span>
         </Button>
       </div>
+      {/* Toast de campos faltantes: acompaña al usuario mientras la página navega al campo */}
+      {toast && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-md items-center gap-2 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-900 shadow-xl animate-fade-in-entry sm:bottom-6"
+        >
+          <AlertCircle className="h-4 w-4 shrink-0 text-amber-600" />
+          <span>{toast}</span>
+        </div>
+      )}
     </form>
   )
 }
