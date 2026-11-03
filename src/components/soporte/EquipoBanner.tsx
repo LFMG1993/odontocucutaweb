@@ -47,11 +47,20 @@ export const EquipoBanner: React.FC<EquipoBannerProps> = ({ equipo }) => {
           </span>
         </div>
 
-        {equipo.ubicacion_especifica && (
+        {(equipo.usuario_asignado || equipo.ubicacion_especifica) && (
           <div className="flex items-center gap-2 text-slate-300">
             <Tag className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
             <span className="truncate">
-              <strong className="text-white font-medium">Ubicación:</strong> {equipo.ubicacion_especifica}
+              <strong className="text-white font-medium">Ubicación:</strong> {equipo.usuario_asignado || equipo.ubicacion_especifica}
+            </span>
+          </div>
+        )}
+
+        {equipo.nombre_usuario_dl && (
+          <div className="flex items-center gap-2 text-slate-300">
+            <User className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span className="truncate">
+              <strong className="text-white font-medium">Asignado:</strong> {equipo.nombre_usuario_dl}
             </span>
           </div>
         )}
@@ -61,15 +70,6 @@ export const EquipoBanner: React.FC<EquipoBannerProps> = ({ equipo }) => {
             <Hash className="w-3.5 h-3.5 text-sky-400 shrink-0" />
             <span className="truncate">
               <strong className="text-white font-medium">Serial:</strong> {equipo.serial}
-            </span>
-          </div>
-        )}
-
-        {equipo.usuario_asignado && (
-          <div className="flex items-center gap-2 text-slate-300">
-            <User className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            <span className="truncate">
-              <strong className="text-white font-medium">Custodio:</strong> {equipo.usuario_asignado}
             </span>
           </div>
         )}

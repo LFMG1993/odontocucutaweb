@@ -1,5 +1,5 @@
 export * from './DoctorLoginPage'
-export * from './DoctorDashboardPage'
+export * from './DoctorHomePage'
+export * from './DoctorLiquidacionesPage'
 export * from './DoctorPagosPage'
-export * from './DoctorAcuerdosPage'
 export * from './DoctorPerfilPage'

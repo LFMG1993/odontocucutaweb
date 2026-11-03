@@ -1,4 +1,5 @@
 import type { RouteObject } from "react-router-dom"
+import { Navigate } from "react-router-dom"
 import { MainLayout } from "@/components/landing/layout/MainLayout"
 import { HomePage } from "@/pages/HomePage"
 import { NosotrosPage } from "@/pages/NosotrosPage"
@@ -19,9 +20,9 @@ import {
 } from "@/components/profesionales"
 import {
   DoctorLoginPage,
-  DoctorDashboardPage,
+  DoctorHomePage,
+  DoctorLiquidacionesPage,
   DoctorPagosPage,
-  DoctorAcuerdosPage,
   DoctorPerfilPage,
 } from "@/pages/profesionales"
 
@@ -54,10 +55,12 @@ export const routes: RouteObject[] = [
     ),
     errorElement: <NotFoundPage />,
     children: [
-      { index: true, element: <DoctorDashboardPage /> },
+      { index: true, element: <DoctorHomePage /> },
+      { path: "liquidaciones", element: <DoctorLiquidacionesPage /> },
       { path: "pagos", element: <DoctorPagosPage /> },
-      { path: "acuerdos", element: <DoctorAcuerdosPage /> },
       { path: "perfil", element: <DoctorPerfilPage /> },
+      // Ruta antigua de acuerdos: se conserva solo como redirección
+      { path: "acuerdos", element: <Navigate to="/profesionales" replace /> },
     ],
   },
   {

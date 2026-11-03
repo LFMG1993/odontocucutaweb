@@ -30,6 +30,13 @@ export interface EquipoInventario {
   sede: string
   ubicacion_especifica?: string | null
   usuario_asignado?: string | null
+  id_usuario_dl?: number | null
+  nombre_usuario_dl?: string | null
+  email_usuario_dl?: string | null
+  celular_usuario_dl?: string | null
+  telefono_usuario_dl?: string | null
+  sucursal_usuario_dl?: string | null
+  caracteristicas?: string | null
 }
 
 export interface SoportePublicoFormData {
@@ -48,6 +55,7 @@ export interface SoportePublicoFormDataResponse {
 export interface CrearTicketPayload {
   solicitante: string
   id_usuario_dl?: number | string | null
+  id_inventario?: number | string | null
   telefono?: string
   telefono_codigo?: string
   telefono_numero?: string

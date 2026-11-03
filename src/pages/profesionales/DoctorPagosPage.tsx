@@ -20,9 +20,6 @@ export const DoctorPagosPage: React.FC = () => {
           <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
             Historial de Pagos
           </h1>
-          <p className="text-xs text-slate-500">
-            Liquidaciones formalmente cerradas y pagadas por administración
-          </p>
         </div>
 
         <button

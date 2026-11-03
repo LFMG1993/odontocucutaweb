@@ -89,8 +89,7 @@ export function useLiquidaciones(initialFiltros?: LiquidacionFiltros) {
         proc.paciente_nombre.toLowerCase().includes(term) ||
         proc.paciente_documento.toLowerCase().includes(term) ||
         proc.nombre_prestacion.toLowerCase().includes(term) ||
-        proc.codigo_cups.toLowerCase().includes(term) ||
-        proc.folio_boleta.toLowerCase().includes(term)
+        proc.codigo_cups.toLowerCase().includes(term)
       )
     })
   }, [data, selectedSede, searchTerm])

@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import {
+  Home,
   Wallet,
   Receipt,
-  FileBadge2,
   User,
   LogOut,
   Stethoscope,
@@ -29,20 +29,20 @@ export const DoctorLayout: React.FC = () => {
   const navItems = [
     {
       to: '/profesionales',
+      label: 'Inicio',
+      icon: Home,
+      end: true,
+    },
+    {
+      to: '/profesionales/liquidaciones',
       label: 'Liquidaciones',
       icon: Wallet,
-      end: true,
+      end: false,
     },
     {
       to: '/profesionales/pagos',
       label: 'Pagos',
       icon: Receipt,
-      end: false,
-    },
-    {
-      to: '/profesionales/acuerdos',
-      label: 'Acuerdos',
-      icon: FileBadge2,
       end: false,
     },
     {

@@ -69,25 +69,6 @@ export interface LiquidacionResponse {
   procedimientos: ProcedimientoLiquidado[]
 }
 
-export interface AcuerdoTarifario {
-  id: number
-  id_profesional_dl: number | null
-  id_prestacion_dl: number | null
-  nombre_prestacion: string | null
-  nombre_sucursal: string | null
-  aplica_sobre: 'REALIZADO' | 'ABONADO' | 'BASE_LIQUIDACION' | string
-  tipo_calculo: 'PORCENTAJE' | 'FIJO' | string
-  valor: string
-  fecha_inicio: string
-  fecha_fin: string | null
-}
-
-export interface AcuerdosData {
-  total_acuerdos: number
-  acuerdos_personales: AcuerdoTarifario[]
-  acuerdos_clinica: AcuerdoTarifario[]
-}
-
 export interface HistorialPago {
   id: number
   id_profesional_dl: number

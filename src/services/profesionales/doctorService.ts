@@ -3,7 +3,6 @@ import type {
   DoctorUser,
   DoctorProfile,
   LiquidacionResponse,
-  AcuerdosData,
   PagosData,
   LoginCredentials,
   ChangePasswordPayload,
@@ -61,19 +60,6 @@ export const doctorService = {
     )
     if (!res.data.data) {
       throw new Error(res.data.message || 'Error al obtener liquidaciones')
-    }
-    return res.data.data
-  },
-
-  /**
-   * Consulta los acuerdos tarifarios vigentes (personales y de clínica)
-   */
-  getAcuerdos: async (): Promise<AcuerdosData> => {
-    const res = await apiClient.get<ApiResponse<AcuerdosData>>(
-      '/api/v1/doctor/acuerdos'
-    )
-    if (!res.data.data) {
-      throw new Error(res.data.message || 'Error al obtener acuerdos')
     }
     return res.data.data
   },

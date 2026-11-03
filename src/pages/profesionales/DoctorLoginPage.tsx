@@ -63,8 +63,8 @@ export const DoctorLoginPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-linear-to-b from-slate-100 via-slate-50 to-white flex flex-col justify-between p-4 sm:p-6 text-slate-900">
       <SEO
-        title="Portal de Profesionales — Acceso Clínico"
-        description="Portal privado para profesionales y especialistas de OdontoCúcuta y OdontoSync."
+        title="Acceso | Odontocúcuta"
+        description="Ingresa a tu cuenta de Odontocúcuta. Acceso para profesionales y pacientes."
       />
 
       {/* Header móvil con link de retorno */}
@@ -92,10 +92,10 @@ export const DoctorLoginPage: React.FC = () => {
               <Stethoscope className="w-7 h-7" />
             </div>
             <h1 className="text-2xl font-black tracking-tight text-slate-900">
-              Portal Profesional
+              Acceso a tu cuenta
             </h1>
             <p className="text-xs text-slate-500 mt-1 font-medium">
-              Consulta tus liquidaciones, procedimientos y acuerdos de pago
+              Ingresa con tus credenciales de Odontocúcuta
             </p>
           </div>
 
@@ -111,7 +111,7 @@ export const DoctorLoginPage: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Usuario / Correo Clínico
+                Usuario
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -162,59 +162,64 @@ export const DoctorLoginPage: React.FC = () => {
               isLoading={isSubmitting}
               className="w-full py-3.5 rounded-xl font-bold text-sm bg-blue-700 hover:bg-blue-800 text-white shadow-lg shadow-blue-700/20 mt-2"
             >
-              Ingresar al Portal
+              Ingresar
             </Button>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-slate-100 text-center">
-            <p className="text-[11px] text-slate-400">
-              ¿Olvidaste tu acceso o tienes problemas para ingresar?
-              <br />
-              <span className="text-slate-600 font-semibold">
-                Contacta a la Coordinación Odontológica de tu sede
-              </span>
-            </p>
-          </div>
         </div>
       </main>
 
-      {/* Footer del login con sección institucional y marca Molink */}
-      <footer className="max-w-4xl w-full mx-auto mt-8 pt-6 border-t border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-4 pb-4">
-        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-xs text-slate-500 text-center sm:text-left">
-          <p>
-            © {new Date().getFullYear()} Odontocúcuta S.A. Todos los derechos reservados.
-          </p>
-          <span className="hidden sm:inline text-slate-300">•</span>
-          <p className="text-[11px] sm:text-xs">
-            Creado y Desarrollado por{" "}
-            <a
-              href="https://molink.com.co"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-700 hover:text-blue-900 font-semibold transition-colors underline decoration-blue-200 underline-offset-2 hover:decoration-blue-600"
+      <footer
+        role="contentinfo"
+        className="w-full -mx-4 -mb-4 mt-10 border-t border-slate-200/80 bg-white/70 backdrop-blur-sm sm:-mx-6 sm:-mb-6"
+      >
+        <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:py-6">
+          <div className="flex min-w-0 flex-col items-center gap-1 text-center text-[11px] leading-relaxed text-slate-500 sm:text-xs lg:items-start lg:text-left">
+            <p className="text-balance">
+              © {new Date().getFullYear()} Odontocúcuta S.A. Todos los derechos reservados.
+            </p>
+            <p>
+              Creado y Desarrollado por{" "}
+              <a
+                href="https://molink.com.co"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-700 hover:text-blue-900 font-semibold transition-colors underline decoration-blue-200 underline-offset-2 hover:decoration-blue-600"
+              >
+                Molink Tecnologia
+              </a>
+            </p>
+          </div>
+
+          {/* Enlaces legales */}
+          <nav
+            aria-label="Enlaces legales"
+            className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-slate-500 sm:gap-x-6 sm:text-xs lg:shrink-0"
+          >
+            <Link
+              to="/contacto"
+              className="whitespace-nowrap transition-colors hover:text-blue-700"
             >
-              Molink Tecnologia
-            </a>
-          </p>
-        </div>
+              Términos y Condiciones
+            </Link>
+            <Link
+              to="/contacto"
+              className="whitespace-nowrap transition-colors hover:text-blue-700"
+            >
+              Política de Privacidad
+            </Link>
+          </nav>
 
-        <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500">
-          <Link to="/contacto" className="hover:text-blue-700 transition-colors">
-            Términos y Condiciones
-          </Link>
-          <Link to="/contacto" className="hover:text-blue-700 transition-colors">
-            Política de Privacidad
-          </Link>
+          {/* Volver arriba */}
+          <button
+            type="button"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-700 transition-colors hover:bg-blue-600 hover:text-white"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            aria-label="Volver arriba"
+          >
+            <ChevronUp className="h-4 w-4" aria-hidden="true" />
+          </button>
         </div>
-
-        <button
-          type="button"
-          className="w-9 h-9 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors shrink-0"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          aria-label="Volver arriba"
-        >
-          <ChevronUp className="w-4 h-4" aria-hidden="true" />
-        </button>
       </footer>
     </div>
   )

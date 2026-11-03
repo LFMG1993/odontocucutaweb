@@ -85,7 +85,7 @@ export const DoctorPerfilPage: React.FC = () => {
       <div className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs space-y-4">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-2">
           <User className="w-4 h-4 text-blue-600" />
-          Ficha Profesional y Ubicación
+          Ficha Profesional
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
@@ -100,7 +100,7 @@ export const DoctorPerfilPage: React.FC = () => {
           <div className="flex items-start gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
             <Phone className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
             <div className="min-w-0">
-              <p className="text-[10px] uppercase font-bold text-slate-400">Celular / Teléfono</p>
+              <p className="text-[10px] uppercase font-bold text-slate-400">Teléfono</p>
               <p className="font-semibold text-slate-800 mt-0.5">{celular}</p>
             </div>
           </div>
@@ -108,7 +108,7 @@ export const DoctorPerfilPage: React.FC = () => {
           <div className="flex items-start gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
             <FileBadge className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
             <div className="min-w-0">
-              <p className="text-[10px] uppercase font-bold text-slate-400">RUT / Identificación</p>
+              <p className="text-[10px] uppercase font-bold text-slate-400">Identificación</p>
               <p className="font-semibold text-slate-800 mt-0.5">{rut}</p>
             </div>
           </div>
@@ -135,7 +135,7 @@ export const DoctorPerfilPage: React.FC = () => {
       <div className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs space-y-3">
         <h2 className="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-blue-600" />
-          Seguridad y Acciones
+          Seguridad
         </h2>
 
         <div className="flex flex-col gap-2 pt-1">
@@ -148,7 +148,6 @@ export const DoctorPerfilPage: React.FC = () => {
               <Lock className="w-4 h-4 text-blue-600" />
               <span>Cambiar Mi Contraseña</span>
             </div>
-            <span className="text-[11px] text-slate-400">Actualizar clave</span>
           </Button>
 
           <button
@@ -159,7 +158,6 @@ export const DoctorPerfilPage: React.FC = () => {
               <LogOut className="w-4 h-4 text-red-600" />
               <span>Cerrar Sesión</span>
             </div>
-            <span className="text-[11px] text-red-400">Finalizar sesión</span>
           </button>
         </div>
       </div>

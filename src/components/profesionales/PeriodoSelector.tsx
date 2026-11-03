@@ -13,6 +13,15 @@ export const PeriodoSelector: React.FC<PeriodoSelectorProps> = ({ filtros, onCha
   const [customDesde, setCustomDesde] = useState(filtros.desde || '')
   const [customHasta, setCustomHasta] = useState(filtros.hasta || '')
 
+  const toggleOpen = () => {
+    if (!isOpen) {
+      // Al abrir, partimos del periodo vigente para evitar fechas desactualizadas
+      setCustomDesde(filtros.desde || '')
+      setCustomHasta(filtros.hasta || '')
+    }
+    setIsOpen((open) => !open)
+  }
+
   const aplicarMesActual = () => {
     const now = new Date()
     const year = now.getFullYear()
@@ -54,7 +63,7 @@ export const PeriodoSelector: React.FC<PeriodoSelectorProps> = ({ filtros, onCha
       <div className="flex items-center justify-between bg-white rounded-2xl p-3 border border-slate-200/80 shadow-xs">
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={toggleOpen}
           className="flex items-center gap-2.5 text-left w-full cursor-pointer focus:outline-none"
         >
           <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
@@ -109,6 +118,7 @@ export const PeriodoSelector: React.FC<PeriodoSelectorProps> = ({ filtros, onCha
                     type="date"
                     value={customDesde}
                     onChange={(e) => setCustomDesde(e.target.value)}
+                    max={customHasta || undefined}
                     required
                     className="w-full text-xs py-1.5 px-2 rounded-lg border border-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none"
                   />
@@ -119,6 +129,7 @@ export const PeriodoSelector: React.FC<PeriodoSelectorProps> = ({ filtros, onCha
                     type="date"
                     value={customHasta}
                     onChange={(e) => setCustomHasta(e.target.value)}
+                    min={customDesde || undefined}
                     required
                     className="w-full text-xs py-1.5 px-2 rounded-lg border border-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none"
                   />

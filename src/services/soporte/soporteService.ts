@@ -39,6 +39,9 @@ export const soporteService = {
     if (payload.id_usuario_dl) {
       formData.append('id_usuario_dl', String(payload.id_usuario_dl))
     }
+    if (payload.id_inventario) {
+      formData.append('id_inventario', String(payload.id_inventario))
+    }
     if (payload.telefono) {
       formData.append('telefono', payload.telefono.trim())
     }

@@ -41,6 +41,18 @@ export function formatDateShort(dateString: unknown): string {
   }
 }
 
+/**
+ * Muestra únicamente el nombre corto de la sede.
+ * Ej: "ODONTOCUCUTA SEDE CAOBOS" -> "CAOBOS"
+ */
+export function formatSede(sede: unknown): string {
+  if (!sede) return '-'
+  const clean = String(sede).trim().replace(/\s+/g, ' ')
+  if (!clean) return '-'
+  const parts = clean.split(' ')
+  return parts[parts.length - 1] ?? clean
+}
+
 export function formatDateTime(dateTimeString: unknown): string {
   if (!dateTimeString) return '-'
   if (typeof dateTimeString !== 'string') return String(dateTimeString)
