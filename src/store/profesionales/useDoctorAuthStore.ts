@@ -3,6 +3,7 @@ import { doctorService } from '@/services/profesionales/doctorService'
 import type {
   DoctorUser,
   DoctorProfile,
+  DoctorLoginResult,
   LoginCredentials,
   ChangePasswordPayload,
 } from '@/types/profesionales'
@@ -17,7 +18,8 @@ export interface DoctorAuthState {
 
   // Acciones
   checkAuth: () => Promise<void>
-  login: (credentials: LoginCredentials) => Promise<DoctorUser>
+  login: (credentials: LoginCredentials) => Promise<DoctorLoginResult>
+  completeSession: (user: DoctorUser) => Promise<void>
   logout: () => Promise<void>
   refreshProfile: () => Promise<void>
   changePassword: (payload: ChangePasswordPayload) => Promise<void>
@@ -70,37 +72,51 @@ export const useDoctorAuthStore = create<DoctorAuthState>((set, get) => ({
   },
 
   /**
-   * Inicia sesión, inyecta la cookie de sesión en el navegador y carga el perfil
+   * Inicia sesión. Si el backend exige 2FA devuelve el desafío y NO marca
+   * la sesión como activa: la cookie solo existe tras completar el 2FA.
    */
   login: async (credentials: LoginCredentials) => {
     set({ isLoading: true })
     try {
-      const loggedUser = await doctorService.login(credentials)
-      let prof: DoctorProfile | null = null
-      try {
-        prof = await doctorService.getProfile()
-      } catch {
-        // En caso de que el perfil demore pero el login sea exitoso
+      const result = await doctorService.login(credentials)
+
+      if (result.requires2FA) {
+        set({ isLoading: false })
+        return result
       }
 
-      const mustChange = Boolean(
-        loggedUser.must_change_password || (prof && Number(prof.must_change_password) === 1)
-      )
-
-      set({
-        user: loggedUser,
-        profile: prof,
-        isAuthenticated: true,
-        mustChangePassword: mustChange,
-        isInitialized: true,
-        isLoading: false,
-      })
-
-      return loggedUser
+      await get().completeSession(result.user)
+      return result
     } catch (error) {
       set({ isLoading: false })
       throw error
     }
+  },
+
+  /**
+   * Completa la sesión tras un login directo o tras validar el 2FA,
+   * cargando la ficha clínica del profesional.
+   */
+  completeSession: async (loggedUser: DoctorUser) => {
+    let prof: DoctorProfile | null = null
+    try {
+      prof = await doctorService.getProfile()
+    } catch {
+      // El login fue exitoso aunque el perfil demore en responder
+    }
+
+    const mustChange = Boolean(
+      loggedUser.must_change_password || (prof && Number(prof.must_change_password) === 1)
+    )
+
+    set({
+      user: loggedUser,
+      profile: prof,
+      isAuthenticated: true,
+      mustChangePassword: mustChange,
+      isInitialized: true,
+      isLoading: false,
+    })
   },
 
   /**

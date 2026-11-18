@@ -87,6 +87,49 @@ export interface PagosData {
   pagos: HistorialPago[]
 }
 
+export interface AcuerdoTarifario {
+  id: number
+  id_profesional_dl: number | null
+  codigo_cups: string | null
+  nombre_prestacion: string | null
+  id_convenio_dl: number | null
+  nombre_convenio: string | null
+  id_sucursal_dl: number | null
+  nombre_sucursal: string | null
+  aplica_sobre: 'REALIZADO' | 'ABONADO' | 'BASE_LIQUIDACION'
+  tipo_calculo: 'PORCENTAJE' | 'FIJO'
+  valor: string
+  fecha_inicio: string
+  fecha_fin: string | null
+}
+
+export interface ConvenioAcuerdo {
+  id_convenio: number
+  nombre: string
+  total_reglas: number
+  total_sin_valor: number
+  tiene_reglas_especiales: boolean
+}
+
+export interface AcuerdosResponse {
+  total_acuerdos: number
+  acuerdos_personales: AcuerdoTarifario[]
+  acuerdos_clinica: AcuerdoTarifario[]
+  convenios: ConvenioAcuerdo[]
+  convenio_seleccionado: { id_convenio: number; nombre: string } | null
+  sede_seleccionada: number | null
+  incluir_sin_valor: boolean
+  tiene_reglas_especiales: boolean
+  modo: 'general' | 'especial'
+  total_sin_valor: number
+}
+
+export interface AcuerdosFiltros {
+  convenio?: number
+  sede?: number
+  incluir_sin_valor?: boolean
+}
+
 export interface LoginCredentials {
   username: string
   password: string
@@ -108,4 +151,106 @@ export interface ApiResponse<T = unknown> {
 export interface LiquidacionFiltros {
   desde?: string
   hasta?: string
+}
+
+// --- Autenticación con doble factor (2FA) ---
+
+export type TwoFactorStep = 'verify' | 'setup_required'
+
+export interface TwoFactorChallenge {
+  step: TwoFactorStep
+  challenge_token: string
+  message?: string
+}
+
+export type DoctorLoginResult =
+  | { requires2FA: false; user: DoctorUser }
+  | { requires2FA: true; challenge: TwoFactorChallenge }
+
+export interface TwoFactorSetupData {
+  secret: string
+  account: string
+  qr_data_uri: string
+  setup_token: string
+  expires_in: number
+}
+
+export interface TwoFactorVerifyData {
+  user: DoctorUser
+  used_recovery: boolean
+  message?: string
+}
+
+export interface TwoFactorConfirmData {
+  user: DoctorUser
+  recovery_codes: string[]
+  used_recovery?: boolean
+}
+
+export type TwoFactorPolicy = 'optional' | 'forced_admins' | 'forced_all' | 'disabled'
+
+export interface TwoFactorStatus {
+  enabled: boolean
+  confirmed_at: string | null
+  policy: TwoFactorPolicy
+  policy_label: string
+  trusted_devices_enabled: boolean
+  trusted_devices_expire_days: number
+}
+
+export interface TrustedDevice {
+  id: number
+  device_name: string | null
+  ip: string | null
+  created_at: string
+  last_used_at: string | null
+  expires_at: string
+}
+
+export interface TrustedDevicesData {
+  devices: TrustedDevice[]
+  enabled: boolean
+  expire_days: number
+}
+
+// --- Recuperación de contraseña ---
+
+export interface PasswordResetVerifyResponse {
+  reset_token: string
+  expires_in: number
+}
+
+// --- Archivos de Google Drive ---
+
+export interface DriveFolder {
+  clave: string
+  nombre: string
+}
+
+export interface DriveFoldersData {
+  configurado: boolean
+  carpetas: DriveFolder[]
+}
+
+export interface DriveItem {
+  id: string
+  name: string
+  mimeType: string
+  size: number | null
+  modifiedTime: string | null
+  isFolder: boolean
+  extension: string
+}
+
+export interface DriveListResponse {
+  carpeta: string
+  nextPageToken: string | null
+  items: DriveItem[]
+}
+
+export interface DriveSheetPreview {
+  modo: 'html'
+  rows: unknown[][]
+  truncated: boolean
+  item: DriveItem
 }

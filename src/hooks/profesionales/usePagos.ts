@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { doctorService } from '@/services/profesionales/doctorService'
+import { useToast } from '@/components/ui'
 import type { HistorialPago } from '@/types/profesionales'
 
 export function usePagos() {
+  const toast = useToast()
   const [pagos, setPagos] = useState<HistorialPago[]>([])
   const [totalPagos, setTotalPagos] = useState<number>(0)
   const [loading, setLoading] = useState<boolean>(true)
@@ -62,7 +64,7 @@ export function usePagos() {
       )
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Error desconocido'
-      alert(`Error al descargar comprobante: ${msg}`)
+      toast.error(`Error al descargar comprobante: ${msg}`)
     } finally {
       setDownloadingId(null)
     }

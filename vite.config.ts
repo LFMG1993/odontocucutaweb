@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import svgr from 'vite-plugin-svgr'
 import { VitePWA } from 'vite-plugin-pwa'
-import { resolve } from 'path'
+import { fileURLToPath } from 'node:url'
 
 export default defineConfig({
   plugins: [
@@ -70,6 +70,17 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
+        // Las librerías de exportación (Excel/PDF) se cargan bajo demanda al pulsar
+        // "Exportar"; no conviene precargarlas en la instalación de la PWA.
+        globIgnores: [
+          '**/jspdf*.js',
+          '**/jspdf.plugin.autotable*.js',
+          '**/html2canvas-*.js',
+          '**/purify.es-*.js',
+          '**/universal-*.js',
+          '**/browser-*.js',
+          '**/index.es-*.js',
+        ],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//],
         cleanupOutdatedCaches: true,
@@ -83,7 +94,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
 })

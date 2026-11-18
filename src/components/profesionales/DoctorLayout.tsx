@@ -7,11 +7,15 @@ import {
   User,
   LogOut,
   Stethoscope,
+  FolderOpen,
 } from 'lucide-react'
 import { useDoctorAuth } from '@/hooks/profesionales/useDoctorAuth'
+import { useConfirm, useToast } from '@/components/ui'
 
 export const DoctorLayout: React.FC = () => {
   const { user, profile, logout } = useDoctorAuth()
+  const confirmar = useConfirm()
+  const toast = useToast()
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
@@ -20,10 +24,18 @@ export const DoctorLayout: React.FC = () => {
   }, [pathname])
 
   const handleLogout = async () => {
-    if (window.confirm('¿Deseas cerrar sesión del Portal de Profesionales?')) {
-      await logout()
-      navigate('/profesionales/login')
-    }
+    const confirmado = await confirmar({
+      title: 'Cerrar sesión',
+      description: '¿Deseas cerrar sesión del Portal de Profesionales?',
+      confirmLabel: 'Cerrar sesión',
+      destructive: true,
+      icon: <LogOut className="w-5 h-5" />,
+    })
+    if (!confirmado) return
+
+    await logout()
+    toast.success('Sesión cerrada correctamente.')
+    navigate('/profesionales/login')
   }
 
   const navItems = [
@@ -43,6 +55,12 @@ export const DoctorLayout: React.FC = () => {
       to: '/profesionales/pagos',
       label: 'Pagos',
       icon: Receipt,
+      end: false,
+    },
+    {
+      to: '/profesionales/archivos',
+      label: 'Archivos',
+      icon: FolderOpen,
       end: false,
     },
     {
@@ -125,7 +143,7 @@ export const DoctorLayout: React.FC = () => {
 
       {/* Bottom Navigation Bar (Mobile First) */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-2 py-1.5 md:hidden shadow-lg shadow-slate-900/5">
-        <div className="max-w-md mx-auto grid grid-cols-4 gap-1">
+        <div className="max-w-md mx-auto grid grid-cols-5 gap-1">
           {navItems.map((item) => {
             const Icon = item.icon
             return (

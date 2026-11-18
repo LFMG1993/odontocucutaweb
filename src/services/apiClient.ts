@@ -1,9 +1,19 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
 
+export type ResponseType = 'json' | 'text' | 'blob'
+
 export interface RequestConfig {
   params?: Record<string, string | number | boolean | undefined | null>
   headers?: Record<string, string>
   signal?: AbortSignal
+  /** Formato esperado del cuerpo de respuesta. Por defecto `json`. */
+  responseType?: ResponseType
+  /**
+   * Evita la redirección automática al login cuando la petición devuelve 401.
+   * Útil en endpoints públicos (login, 2FA, recuperación de contraseña) donde
+   * un 401 es un error de negocio y no una sesión expirada.
+   */
+  skipAuthRedirect?: boolean
 }
 
 export interface ApiClientResponse<T = unknown> {
@@ -43,11 +53,47 @@ function buildUrl(endpoint: string, params?: RequestConfig['params']): string {
   return url.toString()
 }
 
+type InternalRequestOptions = RequestInit & {
+  params?: RequestConfig['params']
+  responseType?: ResponseType
+  skipAuthRedirect?: boolean
+}
+
+function extractErrorMessage(payload: unknown, status: number, statusText: string): string {
+  if (payload && typeof payload === 'object') {
+    const data = payload as { error?: string; message?: string }
+    if (data.error) return data.error
+    if (data.message) return data.message
+  }
+  return `Error HTTP ${status}: ${statusText}`
+}
+
+async function readErrorPayload(response: Response, responseType: ResponseType): Promise<unknown> {
+  const contentType = response.headers.get('content-type') || ''
+  try {
+    if (contentType.includes('application/json')) {
+      return await response.json()
+    }
+    if (responseType === 'blob' || contentType.includes('application/pdf') || contentType.startsWith('image/')) {
+      return null
+    }
+    return await response.text()
+  } catch {
+    return null
+  }
+}
+
 async function request<T>(
   endpoint: string,
-  options: RequestInit & { params?: RequestConfig['params'] } = {}
+  options: InternalRequestOptions = {}
 ): Promise<ApiClientResponse<T>> {
-  const { params, headers = {}, ...customConfig } = options
+  const {
+    params,
+    headers = {},
+    responseType = 'json',
+    skipAuthRedirect = false,
+    ...customConfig
+  } = options
 
   const url = buildUrl(endpoint, params)
 
@@ -71,25 +117,42 @@ async function request<T>(
       ...customConfig,
     })
 
-    if (response.status === 401) {
+    if (response.status === 401 && !skipAuthRedirect) {
       if (!window.location.pathname.includes('/profesionales/login')) {
         window.location.href = '/profesionales/login'
       }
     }
 
-    let responseData: unknown = null
-    const contentType = response.headers.get('content-type')
-    if (contentType && contentType.includes('application/json')) {
-      responseData = await response.json()
-    } else {
-      responseData = await response.text()
+    if (!response.ok) {
+      const payload = await readErrorPayload(response, responseType)
+      throw new ApiError(extractErrorMessage(payload, response.status, response.statusText), response.status, payload)
     }
 
-    if (!response.ok) {
-      const dataObj = responseData as { error?: string; message?: string; errors?: Record<string, string> } | null
-      const errorMessage =
-        dataObj?.error || dataObj?.message || `Error HTTP ${response.status}: ${response.statusText}`
-      throw new ApiError(errorMessage, response.status, responseData)
+    if (response.status === 204) {
+      return {
+        data: null as T,
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+      }
+    }
+
+    if (responseType === 'blob') {
+      const blob = await response.blob()
+      return {
+        data: blob as T,
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+      }
+    }
+
+    let responseData: unknown = null
+    const contentType = response.headers.get('content-type')
+    if (responseType === 'text' || (contentType && !contentType.includes('application/json'))) {
+      responseData = await response.text()
+    } else {
+      responseData = await response.json()
     }
 
     return {
@@ -116,6 +179,8 @@ export const apiClient = {
       params: config?.params,
       headers: config?.headers,
       signal: config?.signal,
+      responseType: config?.responseType,
+      skipAuthRedirect: config?.skipAuthRedirect,
     })
   },
 
@@ -131,6 +196,8 @@ export const apiClient = {
       params: config?.params,
       headers: config?.headers,
       signal: config?.signal,
+      responseType: config?.responseType,
+      skipAuthRedirect: config?.skipAuthRedirect,
     })
   },
 
@@ -146,6 +213,8 @@ export const apiClient = {
       params: config?.params,
       headers: config?.headers,
       signal: config?.signal,
+      responseType: config?.responseType,
+      skipAuthRedirect: config?.skipAuthRedirect,
     })
   },
 
@@ -155,20 +224,17 @@ export const apiClient = {
       params: config?.params,
       headers: config?.headers,
       signal: config?.signal,
+      responseType: config?.responseType,
+      skipAuthRedirect: config?.skipAuthRedirect,
     })
   },
 
-  downloadFile: async (endpoint: string): Promise<Blob> => {
-    const url = buildUrl(endpoint)
-    const response = await fetch(url, {
+  downloadFile: async (endpoint: string, params?: RequestConfig['params']): Promise<Blob> => {
+    const res = await request<Blob>(endpoint, {
       method: 'GET',
-      credentials: 'include',
+      params,
+      responseType: 'blob',
     })
-
-    if (!response.ok) {
-      throw new ApiError(`Error al descargar archivo (${response.status})`, response.status, null)
-    }
-
-    return response.blob()
+    return res.data
   },
 }

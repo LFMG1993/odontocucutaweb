@@ -9,22 +9,43 @@ import {
   LogOut,
   ShieldCheck,
   Building,
+  AlertTriangle,
+  FolderOpen,
+  FileSpreadsheet,
+  ChevronRight,
 } from 'lucide-react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useDoctorAuth } from '@/hooks/profesionales/useDoctorAuth'
-import { ChangePasswordModal } from '@/components/profesionales'
+import { ChangePasswordModal, TwoFactorSecuritySection } from '@/components/profesionales'
+import { useConfirm, useToast } from '@/components/ui'
 import { SEO, Button } from '@/components/shared'
-import { useNavigate } from 'react-router-dom'
+
+interface PerfilLocationState {
+  notice?: string
+}
 
 export const DoctorPerfilPage: React.FC = () => {
   const { profile, user, logout } = useDoctorAuth()
+  const confirmar = useConfirm()
+  const toast = useToast()
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
+  const notice = (location.state as PerfilLocationState | null)?.notice
 
   const handleLogout = async () => {
-    if (window.confirm('¿Seguro que deseas cerrar sesión?')) {
-      await logout()
-      navigate('/profesionales/login')
-    }
+    const confirmado = await confirmar({
+      title: 'Cerrar sesión',
+      description: '¿Seguro que deseas cerrar sesión?',
+      confirmLabel: 'Cerrar sesión',
+      destructive: true,
+      icon: <LogOut className="w-5 h-5" />,
+    })
+    if (!confirmado) return
+
+    await logout()
+    toast.success('Sesión cerrada correctamente.')
+    navigate('/profesionales/login')
   }
 
   const doctorName =
@@ -50,6 +71,19 @@ export const DoctorPerfilPage: React.FC = () => {
           isOpen={isPasswordModalOpen}
           onClose={() => setIsPasswordModalOpen(false)}
         />
+      )}
+
+      {notice === 'recovery-code-used' && (
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2.5 animate-fade-in-entry">
+          <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" aria-hidden="true" />
+          <div>
+            <p className="font-bold">Usaste un código de recuperación</p>
+            <p className="mt-0.5 leading-snug">
+              Ese código ya no es válido. Te recomendamos reconfigurar tu aplicación autenticadora
+              desde la sección de seguridad.
+            </p>
+          </div>
+        </div>
       )}
 
       {/* Tarjeta de Encabezado de Perfil */}
@@ -160,6 +194,33 @@ export const DoctorPerfilPage: React.FC = () => {
             </div>
           </button>
         </div>
+      </div>
+
+      {/* Doble factor de autenticación */}
+      <TwoFactorSecuritySection />
+
+      {/* Accesos rápidos */}
+      <div className="bg-white rounded-3xl p-3 border border-slate-200/80 shadow-xs space-y-1">
+        <Link
+          to="/profesionales/acuerdos"
+          className="flex items-center justify-between gap-2 p-2.5 rounded-xl hover:bg-slate-50 transition-colors"
+        >
+          <span className="flex items-center gap-2 text-xs font-bold text-slate-700">
+            <FileSpreadsheet className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+            Mis acuerdos y tarifas
+          </span>
+          <ChevronRight className="w-4 h-4 text-slate-300" aria-hidden="true" />
+        </Link>
+        <Link
+          to="/profesionales/archivos"
+          className="flex items-center justify-between gap-2 p-2.5 rounded-xl hover:bg-slate-50 transition-colors"
+        >
+          <span className="flex items-center gap-2 text-xs font-bold text-slate-700">
+            <FolderOpen className="w-4 h-4 text-amber-500" aria-hidden="true" />
+            Archivos de la clínica
+          </span>
+          <ChevronRight className="w-4 h-4 text-slate-300" aria-hidden="true" />
+        </Link>
       </div>
     </div>
   )

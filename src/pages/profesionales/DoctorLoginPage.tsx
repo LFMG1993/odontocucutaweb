@@ -1,8 +1,28 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
-import { Lock, Mail, Eye, EyeOff, AlertCircle, ArrowLeft, Stethoscope, ShieldCheck, ChevronUp } from 'lucide-react'
+import {
+  Lock,
+  Mail,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  ArrowLeft,
+  Stethoscope,
+  ShieldCheck,
+  KeyRound,
+  Smartphone,
+} from 'lucide-react'
 import { useDoctorAuthStore } from '@/store/profesionales'
+import { doctorService } from '@/services/profesionales/doctorService'
+import { getApiErrorMessage, getApiErrorStatus } from '@/utils/apiErrors'
 import { Button, SEO } from '@/components/shared'
+import {
+  CodeInput,
+  DoctorPortalFooter,
+  RecoveryCodes,
+  TwoFactorQrPanel,
+} from '@/components/profesionales'
+import type { DoctorUser, TwoFactorChallenge, TwoFactorSetupData } from '@/types/profesionales'
 
 interface LocationState {
   from?: {
@@ -10,14 +30,34 @@ interface LocationState {
   }
 }
 
+type LoginStep = 'credentials' | '2fa-verify' | '2fa-setup' | 'recovery-codes'
+
+function resolverMensajeError(err: unknown, fallback: string): string {
+  if (getApiErrorStatus(err) === 401) {
+    return 'El proceso expiró. Vuelve a iniciar sesión.'
+  }
+  return getApiErrorMessage(err, fallback)
+}
+
 export const DoctorLoginPage: React.FC = () => {
+  const [step, setStep] = useState<LoginStep>('credentials')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [code, setCode] = useState('')
+  const [rememberDevice, setRememberDevice] = useState(false)
+  const [usarRecuperacion, setUsarRecuperacion] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { login, isAuthenticated, isInitialized, checkAuth } = useDoctorAuthStore()
+  // Datos temporales del flujo 2FA (solo en memoria, nunca en localStorage)
+  const [challenge, setChallenge] = useState<TwoFactorChallenge | null>(null)
+  const [setupData, setSetupData] = useState<TwoFactorSetupData | null>(null)
+  const [pendingUser, setPendingUser] = useState<DoctorUser | null>(null)
+  const [recoveryCodes, setRecoveryCodes] = useState<string[]>([])
+  const [destino, setDestino] = useState<{ to: string; notice?: string } | null>(null)
+
+  const { login, completeSession, isAuthenticated, isInitialized, checkAuth } = useDoctorAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
   const state = location.state as LocationState | null
@@ -29,13 +69,41 @@ export const DoctorLoginPage: React.FC = () => {
   }, [isInitialized, checkAuth])
 
   useEffect(() => {
-    if (isAuthenticated) {
-      const from = state?.from?.pathname || '/profesionales'
-      navigate(from, { replace: true })
-    }
-  }, [isAuthenticated, navigate, state])
+    if (!isAuthenticated) return
+    const target = destino ?? { to: state?.from?.pathname || '/profesionales' }
+    navigate(target.to, {
+      replace: true,
+      state: target.notice ? { notice: target.notice } : undefined,
+    })
+  }, [isAuthenticated, destino, navigate, state])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const reiniciarFlujo = () => {
+    setStep('credentials')
+    setChallenge(null)
+    setSetupData(null)
+    setPendingUser(null)
+    setRecoveryCodes([])
+    setCode('')
+    setRememberDevice(false)
+    setUsarRecuperacion(false)
+    setError(null)
+  }
+
+  const solicitarConfiguracion = async (challengeToken: string) => {
+    setIsSubmitting(true)
+    setError(null)
+    try {
+      const data = await doctorService.setupTwoFactorLogin(challengeToken)
+      setSetupData(data)
+      setStep('2fa-setup')
+    } catch (err: unknown) {
+      setError(resolverMensajeError(err, 'No se pudo iniciar la configuración del 2FA.'))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleCredenciales = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
@@ -46,18 +114,130 @@ export const DoctorLoginPage: React.FC = () => {
 
     setIsSubmitting(true)
     try {
-      await login({ username: username.trim(), password })
-      const from = state?.from?.pathname || '/profesionales'
-      navigate(from, { replace: true })
+      const result = await login({ username: username.trim(), password })
+
+      if (!result.requires2FA) {
+        // completeSession ya dejó isAuthenticated en true: el efecto redirige
+        return
+      }
+
+      setChallenge(result.challenge)
+      setCode('')
+
+      if (result.challenge.step === 'setup_required') {
+        setStep('2fa-setup')
+        await solicitarConfiguracion(result.challenge.challenge_token)
+      } else {
+        setStep('2fa-verify')
+      }
     } catch (err: unknown) {
-      const msg =
-        err instanceof Error
-          ? err.message
-          : 'Credenciales incorrectas o problema de comunicación con el servidor.'
-      setError(msg)
+      setError(
+        resolverMensajeError(
+          err,
+          'Credenciales incorrectas o problema de comunicación con el servidor.'
+        )
+      )
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handleVerificar2FA = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!challenge) return
+
+    const codigoNormalizado = code.trim()
+    if (usarRecuperacion ? codigoNormalizado.length < 6 : codigoNormalizado.length !== 6) {
+      setError(
+        usarRecuperacion
+          ? 'Ingresa un código de recuperación válido (ej: A1B2-C3D4).'
+          : 'Ingresa el código de 6 dígitos.'
+      )
+      return
+    }
+
+    setError(null)
+    setIsSubmitting(true)
+    try {
+      const data = await doctorService.verifyTwoFactor({
+        challenge_token: challenge.challenge_token,
+        code: codigoNormalizado,
+        // remember_device solo aplica a códigos TOTP
+        remember_device: usarRecuperacion ? false : rememberDevice,
+      })
+
+      if (data.used_recovery) {
+        setDestino({ to: '/profesionales/perfil', notice: 'recovery-code-used' })
+      }
+
+      setChallenge(null)
+      setCode('')
+      await completeSession(data.user)
+    } catch (err: unknown) {
+      const status = getApiErrorStatus(err)
+      if (status === 401) {
+        reiniciarFlujo()
+      }
+      setError(resolverMensajeError(err, 'Código inválido. Verifica e intenta nuevamente.'))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleConfirmarSetup = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!challenge || !setupData) return
+    if (code.length !== 6) {
+      setError('Ingresa el código de 6 dígitos que muestra tu aplicación.')
+      return
+    }
+
+    setError(null)
+    setIsSubmitting(true)
+    try {
+      const data = await doctorService.confirmTwoFactorLogin({
+        challenge_token: challenge.challenge_token,
+        setup_token: setupData.setup_token,
+        code,
+        remember_device: rememberDevice,
+      })
+      setPendingUser(data.user)
+      setRecoveryCodes(data.recovery_codes || [])
+      setCode('')
+      setStep('recovery-codes')
+    } catch (err: unknown) {
+      const status = getApiErrorStatus(err)
+      if (status === 401) {
+        reiniciarFlujo()
+      }
+      setError(resolverMensajeError(err, 'No se pudo confirmar el código. Intenta de nuevo.'))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleFinalizar = async () => {
+    if (!pendingUser) return
+    setIsSubmitting(true)
+    try {
+      await completeSession(pendingUser)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  let titulo = 'Acceso a tu cuenta'
+  let subtitulo = 'Ingresa con tus credenciales de Odontocúcuta'
+
+  if (step === '2fa-verify') {
+    titulo = 'Verificación en dos pasos'
+    subtitulo = 'Ingresa el código de tu aplicación autenticadora'
+  } else if (step === '2fa-setup') {
+    titulo = 'Activa el doble factor'
+    subtitulo = 'Tu cuenta requiere configurar 2FA para continuar'
+  } else if (step === 'recovery-codes') {
+    titulo = 'Guarda tus códigos'
+    subtitulo = 'Son tu respaldo si pierdes el dispositivo'
   }
 
   return (
@@ -89,14 +269,19 @@ export const DoctorLoginPage: React.FC = () => {
           {/* Logo y Encabezado */}
           <div className="text-center mb-6">
             <div className="w-14 h-14 mx-auto rounded-2xl bg-linear-to-tr from-blue-800 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-600/30 mb-3.5">
-              <Stethoscope className="w-7 h-7" />
+              {step === '2fa-verify' ? (
+                <Smartphone className="w-7 h-7" />
+              ) : step === '2fa-setup' || step === 'recovery-codes' ? (
+                <KeyRound className="w-7 h-7" />
+              ) : (
+                <Stethoscope className="w-7 h-7" />
+              )}
             </div>
-            <h1 className="text-2xl font-black tracking-tight text-slate-900">
-              Acceso a tu cuenta
-            </h1>
-            <p className="text-xs text-slate-500 mt-1 font-medium">
-              Ingresa con tus credenciales de Odontocúcuta
-            </p>
+            <h1 className="text-2xl font-black tracking-tight text-slate-900">{titulo}</h1>
+            <p className="text-xs text-slate-500 mt-1 font-medium">{subtitulo}</p>
+            {step !== 'credentials' && username && (
+              <p className="text-[11px] text-blue-700 font-semibold mt-1 truncate">{username}</p>
+            )}
           </div>
 
           {/* Mensaje de Error */}
@@ -107,120 +292,247 @@ export const DoctorLoginPage: React.FC = () => {
             </div>
           )}
 
-          {/* Formulario */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Usuario
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <Mail className="w-4 h-4" />
+          {/* Paso 1: credenciales */}
+          {step === 'credentials' && (
+            <>
+              <form onSubmit={handleCredenciales} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">Usuario</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      autoComplete="username"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="ejemplo@odontocucuta.com"
+                      required
+                      className="w-full pl-10 pr-3.5 py-3 text-sm rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+                    />
+                  </div>
                 </div>
-                <input
-                  type="text"
-                  autoComplete="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="ejemplo@odontocucuta.com"
-                  required
-                  className="w-full pl-10 pr-3.5 py-3 text-sm rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
-                />
-              </div>
-            </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Contraseña
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <Lock className="w-4 h-4" />
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">Contraseña</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <Lock className="w-4 h-4" />
+                    </div>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      required
+                      className="w-full pl-10 pr-10 py-3 text-sm rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+                      aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  required
-                  className="w-full pl-10 pr-10 py-3 text-sm rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+
+                <div className="flex justify-center m-3">
+                  <Link
+                    to="/profesionales/recuperar-password"
+                    className="text-[11px] font-semibold text-blue-700 hover:text-blue-900"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </Link>
+                </div>
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  isLoading={isSubmitting}
+                  className="w-full py-3.5 rounded-xl font-bold text-sm bg-blue-700 hover:bg-blue-800 text-white shadow-lg shadow-blue-700/20 mt-2"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
+                  Ingresar
+                </Button>
+              </form>
 
-            <Button
-              type="submit"
-              variant="primary"
+            </>
+          )}
+
+          {/* Paso 2a: verificar código 2FA */}
+          {step === '2fa-verify' && (
+            <form onSubmit={handleVerificar2FA} className="space-y-4">
+              <p className="text-xs text-slate-500 leading-relaxed">
+                {usarRecuperacion
+                  ? 'Ingresa uno de los códigos de recuperación que guardaste al activar el doble factor. Cada código sirve una sola vez.'
+                  : 'Abre tu aplicación autenticadora y escribe el código de 6 dígitos.'}
+              </p>
+
+              {usarRecuperacion ? (
+                <div>
+                  <label
+                    htmlFor="codigo-recuperacion"
+                    className="block text-xs font-bold text-slate-700 mb-1.5"
+                  >
+                    Código de recuperación
+                  </label>
+                  <input
+                    id="codigo-recuperacion"
+                    type="text"
+                    value={code}
+                    disabled={isSubmitting}
+                    autoFocus
+                    autoComplete="off"
+                    autoCapitalize="characters"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    placeholder="A1B2-C3D4"
+                    onChange={(e) =>
+                      setCode(
+                        e.target.value
+                          .toUpperCase()
+                          .replace(/[^A-Z0-9-]/g, '')
+                          .slice(0, 12)
+                      )
+                    }
+                    className="w-full px-3.5 py-3 text-center text-lg tracking-[0.25em] font-mono font-bold rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all disabled:opacity-60"
+                  />
+                </div>
+              ) : (
+                <CodeInput
+                  value={code}
+                  onChange={setCode}
+                  disabled={isSubmitting}
+                  autoFocus
+                  label="Código de verificación"
+                />
+              )}
+
+              {!usarRecuperacion && (
+                <label className="flex items-start gap-2 text-xs text-slate-600 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={rememberDevice}
+                    onChange={(e) => setRememberDevice(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-700 focus:ring-blue-600"
+                  />
+                  <span>Recordar este equipo por 30 días.</span>
+                </label>
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setUsarRecuperacion((actual) => !actual)
+                  setCode('')
+                  setError(null)
+                }}
+                className="text-[11px] font-semibold text-blue-700 hover:text-blue-900"
+              >
+                {usarRecuperacion
+                  ? 'Usar el código de mi aplicación autenticadora'
+                  : 'Usar un código de recuperación'}
+              </button>
+
+              <Button
+                type="submit"
+                variant="primary"
+                isLoading={isSubmitting}
+                className="w-full py-3.5 rounded-xl font-bold text-sm bg-blue-700 hover:bg-blue-800 text-white"
+              >
+                Verificar e ingresar
+              </Button>
+
+              <button
+                type="button"
+                onClick={reiniciarFlujo}
+                className="w-full text-[11px] font-semibold text-slate-500 hover:text-slate-800 py-1"
+              >
+                Volver a iniciar sesión
+              </button>
+            </form>
+          )}
+
+          {/* Paso 2b: configurar 2FA obligatorio */}
+          {step === '2fa-setup' && (
+            <form onSubmit={handleConfirmarSetup} className="space-y-4">
+              {setupData ? (
+                <TwoFactorQrPanel
+                  qrDataUri={setupData.qr_data_uri}
+                  secret={setupData.secret}
+                  account={setupData.account}
+                />
+              ) : (
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2">
+                  <p className="text-xs text-slate-500">No se pudo cargar el código QR.</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    isLoading={isSubmitting}
+                    onClick={() =>
+                      challenge && solicitarConfiguracion(challenge.challenge_token)
+                    }
+                    className="text-xs py-2 px-3 rounded-lg"
+                  >
+                    Reintentar
+                  </Button>
+                </div>
+              )}
+
+              <CodeInput
+                value={code}
+                onChange={setCode}
+                disabled={isSubmitting || !setupData}
+                autoFocus={Boolean(setupData)}
+                label="Código generado por la app"
+              />
+
+              <label className="flex items-start gap-2 text-xs text-slate-600 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={rememberDevice}
+                  onChange={(e) => setRememberDevice(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-700 focus:ring-blue-600"
+                />
+                <span>Recordar este equipo por 30 días.</span>
+              </label>
+
+              <Button
+                type="submit"
+                variant="primary"
+                isLoading={isSubmitting}
+                disabled={!setupData}
+                className="w-full py-3.5 rounded-xl font-bold text-sm bg-blue-700 hover:bg-blue-800 text-white"
+              >
+                Confirmar y continuar
+              </Button>
+
+              <button
+                type="button"
+                onClick={reiniciarFlujo}
+                className="w-full text-[11px] font-semibold text-slate-500 hover:text-slate-800 py-1"
+              >
+                Cancelar
+              </button>
+            </form>
+          )}
+
+          {/* Paso 3: códigos de recuperación */}
+          {step === 'recovery-codes' && (
+            <RecoveryCodes
+              codes={recoveryCodes}
+              onConfirm={handleFinalizar}
+              confirmLabel="Continuar al portal"
               isLoading={isSubmitting}
-              className="w-full py-3.5 rounded-xl font-bold text-sm bg-blue-700 hover:bg-blue-800 text-white shadow-lg shadow-blue-700/20 mt-2"
-            >
-              Ingresar
-            </Button>
-          </form>
-
+            />
+          )}
         </div>
       </main>
 
-      <footer
-        role="contentinfo"
-        className="w-full -mx-4 -mb-4 mt-10 border-t border-slate-200/80 bg-white/70 backdrop-blur-sm sm:-mx-6 sm:-mb-6"
-      >
-        <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:py-6">
-          <div className="flex min-w-0 flex-col items-center gap-1 text-center text-[11px] leading-relaxed text-slate-500 sm:text-xs lg:items-start lg:text-left">
-            <p className="text-balance">
-              © {new Date().getFullYear()} Odontocúcuta S.A. Todos los derechos reservados.
-            </p>
-            <p>
-              Creado y Desarrollado por{" "}
-              <a
-                href="https://molink.com.co"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-700 hover:text-blue-900 font-semibold transition-colors underline decoration-blue-200 underline-offset-2 hover:decoration-blue-600"
-              >
-                Molink Tecnologia
-              </a>
-            </p>
-          </div>
-
-          {/* Enlaces legales */}
-          <nav
-            aria-label="Enlaces legales"
-            className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-slate-500 sm:gap-x-6 sm:text-xs lg:shrink-0"
-          >
-            <Link
-              to="/contacto"
-              className="whitespace-nowrap transition-colors hover:text-blue-700"
-            >
-              Términos y Condiciones
-            </Link>
-            <Link
-              to="/contacto"
-              className="whitespace-nowrap transition-colors hover:text-blue-700"
-            >
-              Política de Privacidad
-            </Link>
-          </nav>
-
-          {/* Volver arriba */}
-          <button
-            type="button"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-700 transition-colors hover:bg-blue-600 hover:text-white"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            aria-label="Volver arriba"
-          >
-            <ChevronUp className="h-4 w-4" aria-hidden="true" />
-          </button>
-        </div>
-      </footer>
+      <DoctorPortalFooter />
     </div>
   )
 }

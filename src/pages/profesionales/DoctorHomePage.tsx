@@ -69,21 +69,55 @@ export const DoctorHomePage: React.FC = () => {
         <div className="space-y-4 animate-fade-in-entry">
           <MetricCard resumen={data.resumen} />
 
-          {/* Acceso a la vista detallada */}
-          <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-xs font-bold text-slate-800">¿Necesitas el detalle?</p>
-              <p className="text-[11px] text-slate-500 mt-0.5">
-                Filtra por fechas y consulta todos los procedimientos realizados.
-              </p>
+          {/* Accesos rápidos */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-slate-800">¿Necesitas el detalle?</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Filtra por fechas y consulta todos los procedimientos realizados.
+                </p>
+              </div>
+              <Link
+                to="/profesionales/liquidaciones"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-700 text-white text-xs font-semibold hover:bg-blue-800 transition-colors shrink-0"
+              >
+                Ver liquidaciones
+                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+              </Link>
             </div>
-            <Link
-              to="/profesionales/liquidaciones"
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-700 text-white text-xs font-semibold hover:bg-blue-800 transition-colors shrink-0"
-            >
-              Ver liquidaciones
-              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-            </Link>
+
+            <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-slate-800">Mis acuerdos</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Revisa tus porcentajes y tarifas fijas configuradas.
+                </p>
+              </div>
+              <Link
+                to="/profesionales/acuerdos"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-colors shrink-0"
+              >
+                Ver acuerdos
+                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center justify-between gap-3 sm:col-span-2">
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-slate-800">Archivos de la clínica</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Agendas, protocolos y documentos compartidos (solo lectura).
+                </p>
+              </div>
+              <Link
+                to="/profesionales/archivos"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:border-blue-300 hover:text-blue-700 transition-colors shrink-0"
+              >
+                Explorar
+                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+              </Link>
+            </div>
           </div>
 
           <p className="text-[11px] text-center text-slate-400">
