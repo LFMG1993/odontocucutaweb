@@ -11,8 +11,8 @@ export default defineConfig({
     tailwindcss(),
     svgr(),
     VitePWA({
-      registerType: 'autoUpdate',
-      injectRegister: 'auto',
+      registerType: 'prompt',
+      injectRegister: false,
       includeAssets: [
         'favicon.svg',
         'apple-touch-icon.png',
@@ -82,8 +82,6 @@ export default defineConfig({
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//],
         cleanupOutdatedCaches: true,
-        clientsClaim: true,
-        skipWaiting: true,
       },
       devOptions: {
         enabled: false,
