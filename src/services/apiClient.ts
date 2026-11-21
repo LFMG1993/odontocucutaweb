@@ -118,8 +118,9 @@ async function request<T>(
     })
 
     if (response.status === 401 && !skipAuthRedirect) {
-      if (!window.location.pathname.includes('/profesionales/login')) {
-        window.location.href = '/profesionales/login'
+      const path = window.location.pathname
+      if (!path.startsWith('/login') && !path.startsWith('/profesionales/login')) {
+        window.location.href = '/login'
       }
     }
 

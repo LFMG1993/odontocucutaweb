@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useDoctorAuth } from '@/hooks/profesionales/useDoctorAuth'
 import { useConfirm, useToast } from '@/components/ui'
+import { PwaInstallPrompt } from '@/components/shared'
 
 export const DoctorLayout: React.FC = () => {
   const { user, profile, logout } = useDoctorAuth()
@@ -35,7 +36,7 @@ export const DoctorLayout: React.FC = () => {
 
     await logout()
     toast.success('Sesión cerrada correctamente.')
-    navigate('/profesionales/login')
+    navigate('/login')
   }
 
   const navItems = [
@@ -140,6 +141,8 @@ export const DoctorLayout: React.FC = () => {
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-4 sm:py-6">
         <Outlet />
       </main>
+
+      <PwaInstallPrompt variant="portal" />
 
       {/* Bottom Navigation Bar (Mobile First) */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-2 py-1.5 md:hidden shadow-lg shadow-slate-900/5">

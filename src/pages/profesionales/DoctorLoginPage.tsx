@@ -15,7 +15,7 @@ import {
 import { useDoctorAuthStore } from '@/store/profesionales'
 import { doctorService } from '@/services/profesionales/doctorService'
 import { getApiErrorMessage, getApiErrorStatus } from '@/utils/apiErrors'
-import { Button, SEO } from '@/components/shared'
+import { Button, PwaInstallPrompt, SEO } from '@/components/shared'
 import {
   CodeInput,
   DoctorPortalFooter,
@@ -70,7 +70,12 @@ export const DoctorLoginPage: React.FC = () => {
 
   useEffect(() => {
     if (!isAuthenticated) return
-    const target = destino ?? { to: state?.from?.pathname || '/profesionales' }
+    const fromPath = state?.from?.pathname
+    const safeFrom =
+      fromPath && !fromPath.startsWith('/login') && !fromPath.startsWith('/profesionales/login')
+        ? fromPath
+        : '/profesionales'
+    const target = destino ?? { to: safeFrom }
     navigate(target.to, {
       replace: true,
       state: target.notice ? { notice: target.notice } : undefined,
@@ -342,7 +347,7 @@ export const DoctorLoginPage: React.FC = () => {
 
                 <div className="flex justify-center m-3">
                   <Link
-                    to="/profesionales/recuperar-password"
+                    to="/recuperar-password"
                     className="text-[11px] font-semibold text-blue-700 hover:text-blue-900"
                   >
                     ¿Olvidaste tu contraseña?
@@ -530,6 +535,8 @@ export const DoctorLoginPage: React.FC = () => {
             />
           )}
         </div>
+
+        <PwaInstallPrompt variant="login" />
       </main>
 
       <DoctorPortalFooter />

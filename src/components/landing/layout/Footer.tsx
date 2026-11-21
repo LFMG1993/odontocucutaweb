@@ -60,7 +60,7 @@ const footerLinks = {
     { label: "Contacto", href: "/contacto" },
     { label: "Blog", href: "/blog" },
     { label: "Mesa de Ayuda TI", href: "/soporte" },
-    { label: "Portal Profesionales", href: "/profesionales/login" },
+    { label: "Portal Profesionales", href: "/login" },
   ],
 }
 

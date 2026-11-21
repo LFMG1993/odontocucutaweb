@@ -28,7 +28,7 @@ export default defineConfig({
           'Accede al portal de Odontocúcuta para profesionales y pacientes desde cualquier dispositivo.',
         lang: 'es-CO',
         dir: 'ltr',
-        start_url: '/profesionales/login',
+        start_url: '/login',
         scope: '/',
         display: 'standalone',
         orientation: 'any',
@@ -70,8 +70,6 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
-        // Las librerías de exportación (Excel/PDF) se cargan bajo demanda al pulsar
-        // "Exportar"; no conviene precargarlas en la instalación de la PWA.
         globIgnores: [
           '**/jspdf*.js',
           '**/jspdf.plugin.autotable*.js',

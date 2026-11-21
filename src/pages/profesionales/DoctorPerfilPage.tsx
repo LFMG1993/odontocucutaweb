@@ -45,7 +45,7 @@ export const DoctorPerfilPage: React.FC = () => {
 
     await logout()
     toast.success('Sesión cerrada correctamente.')
-    navigate('/profesionales/login')
+    navigate('/login')
   }
 
   const doctorName =

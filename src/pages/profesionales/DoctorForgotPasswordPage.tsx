@@ -200,12 +200,12 @@ export const DoctorForgotPasswordPage: React.FC = () => {
     <div className="min-h-screen bg-linear-to-b from-slate-100 via-slate-50 to-white flex flex-col p-4 sm:p-6 text-slate-900">
       <SEO
         title="Recuperar contraseña | Odontocúcuta"
-        description="Restablece la contraseña de tu cuenta del Portal de Profesionales de Odontocúcuta."
+        description="Restablece la contraseña de tu cuenta en Odontocúcuta."
       />
 
       <header className="max-w-md w-full mx-auto flex items-center justify-between pt-2">
         <Link
-          to="/profesionales/login"
+          to="/login"
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors py-1.5 px-3 rounded-full hover:bg-slate-200/60"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
@@ -419,7 +419,7 @@ export const DoctorForgotPasswordPage: React.FC = () => {
               <Button
                 type="button"
                 variant="primary"
-                onClick={() => navigate('/profesionales/login', { replace: true })}
+                onClick={() => navigate('/login', { replace: true })}
                 className="w-full py-3.5 rounded-xl font-bold text-sm bg-blue-700 hover:bg-blue-800 text-white"
               >
                 Ir al inicio de sesión

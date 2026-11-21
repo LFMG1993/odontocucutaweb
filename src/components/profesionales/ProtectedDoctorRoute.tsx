@@ -26,7 +26,7 @@ export const ProtectedDoctorRoute: React.FC<{ children: React.ReactNode }> = ({ 
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/profesionales/login" state={{ from: location }} replace />
+    return <Navigate to="/login" state={{ from: location }} replace />
   }
 
   return (

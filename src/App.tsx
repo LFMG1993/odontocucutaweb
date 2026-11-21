@@ -3,6 +3,7 @@ import { HelmetProvider } from "react-helmet-async"
 import { routes } from "./router"
 import { CitaModalProvider } from "./context/CitaModalContext"
 import { ToastProvider, ConfirmProvider } from "./components/ui"
+import "@/utils/pwaInstall"
 
 const router = createBrowserRouter(routes)
 

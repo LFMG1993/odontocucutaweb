@@ -1,4 +1,4 @@
-import type { RouteObject } from "react-router-dom"
+import { Navigate, useLocation, type RouteObject } from "react-router-dom"
 import { MainLayout } from "@/components/landing/layout/MainLayout"
 import { HomePage } from "@/pages/HomePage"
 import { NosotrosPage } from "@/pages/NosotrosPage"
@@ -28,8 +28,19 @@ import {
   DoctorPerfilPage,
 } from "@/pages/profesionales"
 
+// eslint-disable-next-line react-refresh/only-export-components
+function LegacyRedirect({ to }: { to: string }) {
+  const location = useLocation()
+  return (
+    <Navigate
+      to={{ pathname: to, search: location.search, hash: location.hash }}
+      state={location.state}
+      replace
+    />
+  )
+}
+
 export const routes: RouteObject[] = [
-  // Rutas Públicas de la Clínica Odontológica
   {
     path: "/",
     element: <MainLayout />,
@@ -47,7 +58,29 @@ export const routes: RouteObject[] = [
       { path: "soporte", element: <SoportePage /> },
     ],
   },
-  // Portal de Profesionales OdontoSync
+
+  // Acceso unificado (profesionales y, a futuro, pacientes)
+  {
+    path: "/login",
+    element: <DoctorLoginPage />,
+    errorElement: <NotFoundPage />,
+  },
+  {
+    path: "/recuperar-password",
+    element: <DoctorForgotPasswordPage />,
+    errorElement: <NotFoundPage />,
+  },
+
+  // Rutas legacy para marcadores y PWAs instaladas previamente
+  {
+    path: "/profesionales/login",
+    element: <LegacyRedirect to="/login" />,
+  },
+  {
+    path: "/profesionales/recuperar-password",
+    element: <LegacyRedirect to="/recuperar-password" />,
+  },
+
   {
     path: "/profesionales",
     element: (
@@ -64,15 +97,5 @@ export const routes: RouteObject[] = [
       { path: "archivos", element: <DoctorArchivosPage /> },
       { path: "perfil", element: <DoctorPerfilPage /> },
     ],
-  },
-  {
-    path: "/profesionales/login",
-    element: <DoctorLoginPage />,
-    errorElement: <NotFoundPage />,
-  },
-  {
-    path: "/profesionales/recuperar-password",
-    element: <DoctorForgotPasswordPage />,
-    errorElement: <NotFoundPage />,
   },
 ]
